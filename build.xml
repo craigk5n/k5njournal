@@ -1,5 +1,5 @@
 <!-- ant build.xml file for k5n ical lib -->
-<!-- $Id: build.xml,v 1.1 2007-04-27 20:55:37 cknudsen Exp $ -->
+<!-- $Id: build.xml,v 1.2 2007-04-27 21:21:57 cknudsen Exp $ -->
 
 <project name="k5njournal" default="dist" basedir=".">
   <description>Top-level build file for k5nJournal</description>
@@ -38,6 +38,7 @@
     <!-- Put all the k5njournal files into a single jar
          and designate the main class -->
     <jar jarfile="${dist}/k5njournal-${version}.jar" basedir="${build}">
+    <zipfileset src="${k5n-ical-lib}" />
     <manifest>
        <attribute name="Main-Class" value="us.k5n.journal.Main"/>
     </manifest>

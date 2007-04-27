@@ -25,9 +25,13 @@ version number):
                          RUNNING THE APP
 ---------------------------------------------------------------------------
 
-To run the k5njournal application, you will need to add both the
-k5njournal-N.N.N.jar file and all jar files found in the "lib" directory
-to your java classpath.
+To run the k5njournal application, you can double-click on the file
+in your file browser (Windows Explorer, Mac OS X Finder, etc.), or you
+can start it from the command line:
+
+java -jar k5njournal-N.N.N.jar
+
+(where N.N.N is the version)
 
 ---------------------------------------------------------------------------
                          LICENSE
