@@ -1,0 +1,29 @@
+k5nJournal ChangeLog
+Version: $Id: ChangeLog,v 1.1 2007-04-27 21:09:05 cknudsen Exp $
+
+Version 0.3.0 (27 Apr 2007)
+- Updated build.xml to use new repository structure (k5njournal's CVS repository
+  rather than the javacaltools repository)
+  
+Version 0.2.6 (24 Apr 2007)
+- replaced "Clear" button for text search with graphic icon
+
+Version 0.2.5 (24 Apr 2007)
+- Added text search filter
+- Added export to ics in "File" menu
+- fixed bug: clicking on journal list column headers to sort
+  was causing wrong entry to be displayed if you selected one.
+  
+Version 0.2.4 (18 Apr 2007)
+- in entry descriptions, wrap text at word boundaries (view/edit)
+- don't NullPointerException when data file is missing DTSTART values
+- default to Windows look and feel
+
+Version 0.2.3 (18 Apr 2007)
+- Fixed bug: JTree was not refreshing to show newly added dates
+
+Version 0.2.2 (17 Apr 2007)
+- Fix bug: NullPointerException if no journal entries yet
+
+Version 0.2.1 (16 Apr 2007)
+- Fixed bug: using Java 1.4

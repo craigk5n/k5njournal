@@ -59,12 +59,12 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.3 2007-04-27 20:54:39 cknudsen Exp $
+ * @version $Id: Main.java,v 1.4 2007-04-27 21:09:05 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, RepositoryChangeListener {
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
-	public static final String VERSION = "0.2.6 (24 Apr 2007)";
+	public static final String VERSION = "0.3.0 (27 Apr 2007)";
 	JFrame parent;
 	JLabel messageArea;
 	Repository dataRepository;
