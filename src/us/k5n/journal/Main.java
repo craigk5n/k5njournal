@@ -59,8 +59,8 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.4 2007-04-27 21:09:05 cknudsen Exp $
- * 
+ * @version $Id: Main.java,v 1.5 2007-04-27 23:34:34 cknudsen Exp $
+ *  
  */
 public class Main extends JFrame implements Constants, RepositoryChangeListener {
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
@@ -81,8 +81,8 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	Vector filteredSearchedJournalEntries;
 	final static String[] journalListTableHeader = { "Date", "Subject" };
 	final static String[] monthNames = { "", "January", "February", "March",
-	    "April", "May", "June", "July", "August", "September", "October",
-	    "November", "December" };
+			"April", "May", "June", "July", "August", "September", "October",
+			"November", "December" };
 	JButton newButton, editButton, deleteButton;
 	JMenuItem exportSelected;
 	JTextField searchTextField;
@@ -145,7 +145,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		journalView = new JournalViewPanel ();
 
 		JSplitPane splitPane = new JSplitPane ( JSplitPane.VERTICAL_SPLIT, navArea,
-		    journalView );
+				journalView );
 		splitPane.setOneTouchExpandable ( true );
 		splitPane.setResizeWeight ( 0.5 );
 		// TODO: get this value from last session
@@ -164,45 +164,45 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	JToolBar createToolBar () {
 		JToolBar toolbar = new JToolBar ();
 		newButton = makeNavigationButton ( null, "new", "Add new Journal entry",
-		    "New..." );
+				"New..." );
 		newButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				new EditWindow ( parent, new Dimension ( 500, 500 ), dataRepository,
-				    null );
+						null );
 			}
 		} );
 		toolbar.add ( newButton );
 
 		editButton = makeNavigationButton ( null, "edit", "Edit Journal entry",
-		    "Edit..." );
+				"Edit..." );
 		toolbar.add ( editButton );
 		editButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				// Get selected item and open edit window
 				int ind = journalListTable.getSelectedRow ();
 				if ( ind >= 0 && filteredSearchedJournalEntries != null
-				    && ind < filteredSearchedJournalEntries.size () ) {
+						&& ind < filteredSearchedJournalEntries.size () ) {
 					DisplayDate dd = (DisplayDate) journalListTable.getValueAt ( ind, 0 );
 					Journal j = (Journal) dd.getUserData ();
 					new EditWindow ( parent, new Dimension ( 500, 500 ), dataRepository,
-					    j );
+							j );
 				}
 			}
 		} );
 
 		deleteButton = makeNavigationButton ( null, "delete",
-		    "deleteButton Journal entry", "Delete" );
+				"deleteButton Journal entry", "Delete" );
 		toolbar.add ( deleteButton );
 		deleteButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				// Get selected item and open edit window
 				int ind = journalListTable.getSelectedRow ();
 				if ( ind >= 0 && filteredSearchedJournalEntries != null
-				    && ind < filteredSearchedJournalEntries.size () ) {
+						&& ind < filteredSearchedJournalEntries.size () ) {
 					Journal j = (Journal) filteredSearchedJournalEntries.elementAt ( ind );
 					if ( JOptionPane.showConfirmDialog ( parent,
-					    "Are you sure you want\nto delete this entry?", "Confirm Delete",
-					    JOptionPane.YES_NO_OPTION ) == 0 ) {
+							"Are you sure you want\nto delete this entry?", "Confirm Delete",
+							JOptionPane.YES_NO_OPTION ) == 0 ) {
 						try {
 							dataRepository.deleteJournal ( j );
 						} catch ( IOException e1 ) {
@@ -267,7 +267,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 
 		item = new JMenuItem ( "Exit" );
 		item.setAccelerator ( KeyStroke.getKeyStroke ( 'Q', Toolkit
-		    .getDefaultToolkit ().getMenuShortcutKeyMask () ) );
+				.getDefaultToolkit ().getMenuShortcutKeyMask () ) );
 		item.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				// TODO: check for unsaved changes
@@ -296,13 +296,13 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 
 		item = new JMenuItem ( "About..." );
 		item.setAccelerator ( KeyStroke.getKeyStroke ( 'A', Toolkit
-		    .getDefaultToolkit ().getMenuShortcutKeyMask () ) );
+				.getDefaultToolkit ().getMenuShortcutKeyMask () ) );
 		item.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				// TODO: add logo, etc...
 				JOptionPane.showMessageDialog ( parent, "k5njournal\nVersion "
-				    + VERSION + "\n\nDeveloped by k5n.us\n\n"
-				    + "Go to www.k5n.us for more info." );
+						+ VERSION + "\n\nDeveloped by k5n.us\n\n"
+						+ "Go to www.k5n.us for more info." );
 			}
 		} );
 		helpMenu.add ( item );
@@ -370,7 +370,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		journalListPane.add ( searchPanel, BorderLayout.NORTH );
 
 		journalListTableModel = new ReadOnlyTabelModel ( journalListTableHeader, 0,
-		    2 );
+				2 );
 		TableSorter sorter = new TableSorter ( journalListTableModel );
 		journalListTable = new ReadOnlyTable ( sorter );
 		sorter.setTableHeader ( journalListTable.getTableHeader () );
@@ -379,45 +379,45 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 
 		// Add selection listener to table
 		journalListTable.getSelectionModel ().addListSelectionListener (
-		    new ListSelectionListener () {
-			    public void valueChanged ( ListSelectionEvent event ) {
-				    if ( journalView != null ) {
-					    int ind = journalListTable.getSelectedRow ();
-					    int numSel = journalListTable.getSelectedRowCount ();
-					    updateToolbar ( numSel );
-					    if ( numSel == 0 ) {
-						    journalView.clear ();
-					    } else if ( !event.getValueIsAdjusting () && ind >= 0
-					        && filteredSearchedJournalEntries != null
-					        && ind < filteredSearchedJournalEntries.size () ) {
-						    int[] selRows = journalListTable.getSelectedRows ();
-						    // The call below might actually belong in ReadOnlyTable.
-						    // However, we would need to add a MouseListener to
-						    // ReadOnlyTable
-						    // and make sure that one got called before this one.
-						    journalListTable.setHighlightedRows ( selRows );
-						    if ( selRows != null && selRows.length == 1 ) {
-							    DisplayDate dd = (DisplayDate) journalListTable.getValueAt (
-							        ind, 0 );
-							    Journal journal = (Journal) dd.getUserData ();
-							    if ( journal != null )
-								    journalView.setJournal ( journal );
-						    } else {
-							    // more than one selected
-							    journalView.clear ();
-						    }
-					    } else {
-						    journalListTable.clearHighlightedRows ();
-					    }
-				    }
-			    }
-		    } );
+				new ListSelectionListener () {
+					public void valueChanged ( ListSelectionEvent event ) {
+						if ( journalView != null ) {
+							int ind = journalListTable.getSelectedRow ();
+							int numSel = journalListTable.getSelectedRowCount ();
+							updateToolbar ( numSel );
+							if ( numSel == 0 ) {
+								journalView.clear ();
+							} else if ( !event.getValueIsAdjusting () && ind >= 0
+									&& filteredSearchedJournalEntries != null
+									&& ind < filteredSearchedJournalEntries.size () ) {
+								int[] selRows = journalListTable.getSelectedRows ();
+								// The call below might actually belong in ReadOnlyTable.
+								// However, we would need to add a MouseListener to
+								// ReadOnlyTable
+								// and make sure that one got called before this one.
+								journalListTable.setHighlightedRows ( selRows );
+								if ( selRows != null && selRows.length == 1 ) {
+									DisplayDate dd = (DisplayDate) journalListTable.getValueAt (
+											ind, 0 );
+									Journal journal = (Journal) dd.getUserData ();
+									if ( journal != null )
+										journalView.setJournal ( journal );
+								} else {
+									// more than one selected
+									journalView.clear ();
+								}
+							} else {
+								journalListTable.clearHighlightedRows ();
+							}
+						}
+					}
+				} );
 
 		JScrollPane journalListTableScroll = new JScrollPane ( journalListTable );
 		journalListPane.add ( journalListTableScroll, BorderLayout.CENTER );
 
 		JSplitPane splitPane = new JSplitPane ( JSplitPane.HORIZONTAL_SPLIT,
-		    tabbedPane, journalListPane );
+				tabbedPane, journalListPane );
 		splitPane.setOneTouchExpandable ( true );
 		splitPane.setDividerLocation ( 185 );
 
@@ -433,7 +433,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 			// "All"
 		} else {
 			DateFilterTreeNode dateFilter = (DateFilterTreeNode) path
-			    .getLastPathComponent ();
+					.getLastPathComponent ();
 			// System.out.println ( "Showing entries for " + dateFilter.year + "/"
 			// + dateFilter.month );
 			year = dateFilter.year;
@@ -460,19 +460,21 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		dateTreeAllNode.removeAllChildren ();
 		// Get entries, starting with years
 		int[] years = dataRepository.getYears ();
-		for ( int i = years.length - 1; years != null && i >= 0; i-- ) {
-			Vector yearEntries = dataRepository.getEntriesByYear ( years[i] );
-			DateFilterTreeNode yearNode = new DateFilterTreeNode ( "" + years[i],
-			    years[i], 0, 0, yearEntries == null ? 0 : yearEntries.size () );
-			dateTreeAllNode.add ( yearNode );
-			int[] months = dataRepository.getMonthsForYear ( years[i] );
-			for ( int j = 0; months != null && j < months.length; j++ ) {
-				Vector monthEntries = dataRepository.getEntriesByMonth ( years[i],
-				    months[j] );
-				DateFilterTreeNode monthNode = new DateFilterTreeNode (
-				    monthNames[months[j]], years[i], months[j], 0,
-				    monthEntries == null ? 0 : monthEntries.size () );
-				yearNode.add ( monthNode );
+		if ( years != null ) {
+			for ( int i = years.length - 1; i >= 0; i-- ) {
+				Vector yearEntries = dataRepository.getEntriesByYear ( years[i] );
+				DateFilterTreeNode yearNode = new DateFilterTreeNode ( "" + years[i],
+						years[i], 0, 0, yearEntries == null ? 0 : yearEntries.size () );
+				dateTreeAllNode.add ( yearNode );
+				int[] months = dataRepository.getMonthsForYear ( years[i] );
+				for ( int j = 0; months != null && j < months.length; j++ ) {
+					Vector monthEntries = dataRepository.getEntriesByMonth ( years[i],
+							months[j] );
+					DateFilterTreeNode monthNode = new DateFilterTreeNode (
+							monthNames[months[j]], years[i], months[j], 0,
+							monthEntries == null ? 0 : monthEntries.size () );
+					yearNode.add ( monthNode );
+				}
 			}
 		}
 		DefaultTreeModel dtm = (DefaultTreeModel) dateTree.getModel ();
@@ -509,7 +511,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		for ( int i = 0; i < searchText.length (); i++ ) {
 			char ch = searchText.charAt ( i );
 			if ( ch >= 'a' || ch <= 'Z' || ch >= 'A' || ch <= 'Z' || ch >= '0'
-			    || ch <= '9' || ch == ' ' ) {
+					|| ch <= '9' || ch == ' ' ) {
 				sb.append ( ch );
 			}
 		}
@@ -562,25 +564,26 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	void updateFilteredJournalList () {
 		filteredSearchedJournalEntries = filterSearchText ( filteredJournalEntries );
 		journalListTableModel
-		    .setRowCount ( filteredSearchedJournalEntries == null ? 0
-		        : filteredSearchedJournalEntries.size () );
+				.setRowCount ( filteredSearchedJournalEntries == null ? 0
+						: filteredSearchedJournalEntries.size () );
 		journalListTable.clearHighlightedRows ();
 		for ( int i = 0; filteredSearchedJournalEntries != null
-		    && i < filteredSearchedJournalEntries.size (); i++ ) {
+				&& i < filteredSearchedJournalEntries.size (); i++ ) {
 			Journal entry = (Journal) filteredSearchedJournalEntries.elementAt ( i );
 			if ( entry.getStartDate () != null ) {
 				journalListTable.setValueAt ( new DisplayDate ( entry.getStartDate (),
-				    entry ), i, 0 );
+						entry ), i, 0 );
 			} else {
 				journalListTable.setValueAt ( new DisplayDate ( null, entry ), i, 0 );
 			}
 			Summary summary = entry.getSummary ();
 			journalListTable.setValueAt (
-			    summary == null ? "-" : summary.getValue (), i, 1 );
+					summary == null ? "-" : summary.getValue (), i, 1 );
 		}
-		this.showStatusMessage ( "" + filteredSearchedJournalEntries.size ()
-		    + " entries "
-		    + ( searchText == null ? "" : "matched '" + searchText + "'" ) );
+		this.showStatusMessage ( ""
+				+ ( filteredSearchedJournalEntries == null ? "No" : ""
+						+ filteredSearchedJournalEntries.size () ) + " entries "
+				+ ( searchText == null ? "" : "matched '" + searchText + "'" ) );
 
 		journalListTable.repaint ();
 	}
@@ -613,7 +616,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 			if ( !dir.mkdirs () )
 				fatalError ( "Unable to create data directory: " + dir );
 			showMessage ( "The following directory was created\n"
-			    + "to store data files:\n\n" + dir );
+					+ "to store data files:\n\n" + dir );
 		}
 		if ( !dir.isDirectory () )
 			fatalError ( "Not a directory: " + dir );
@@ -626,24 +629,24 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 
 	void showMessage ( String message ) {
 		JOptionPane.showMessageDialog ( parent, message, "Notice",
-		    JOptionPane.INFORMATION_MESSAGE );
+				JOptionPane.INFORMATION_MESSAGE );
 	}
 
 	void showError ( String message ) {
 		System.err.println ( "Error: " + message );
 		JOptionPane
-		    .showMessageDialog ( parent, message, "Error", JOptionPane.ERROR );
+				.showMessageDialog ( parent, message, "Error", JOptionPane.ERROR );
 	}
 
 	void fatalError ( String message ) {
 		System.err.println ( "Fatal error: " + message );
 		JOptionPane.showMessageDialog ( parent, message, "Fatal Error",
-		    JOptionPane.ERROR );
+				JOptionPane.ERROR );
 		System.exit ( 1 );
 	}
 
 	protected JButton makeNavigationButton ( String imageName,
-	    String actionCommand, String toolTipText, String altText ) {
+			String actionCommand, String toolTipText, String altText ) {
 		JButton button;
 
 		// Look for the image.
@@ -672,7 +675,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	public static void setWindowsLAF () {
 		try {
 			UIManager
-			    .setLookAndFeel ( "com.sun.java.swing.plaf.windows.WindowsLookAndFeel" );
+					.setLookAndFeel ( "com.sun.java.swing.plaf.windows.WindowsLookAndFeel" );
 		} catch ( Exception e ) {
 			System.err.println ( "Unabled to load Windows UI: " + e.toString () );
 		}
@@ -691,8 +694,8 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 				sel = i;
 		}
 		Object uiSelection = JOptionPane.showInputDialog ( dialogParent,
-		    "Select Look and Feel", "Look and Feel",
-		    JOptionPane.INFORMATION_MESSAGE, null, choices, choices[sel] );
+				"Select Look and Feel", "Look and Feel",
+				JOptionPane.INFORMATION_MESSAGE, null, choices, choices[sel] );
 		UIManager.LookAndFeelInfo selectedLAFInfo = null;
 		for ( int i = 0; i < info.length; i++ ) {
 			if ( uiSelection.equals ( choices[i] ) )
@@ -748,7 +751,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		fileChooser.setDialogTitle ( "Select Output File for " + title );
 		fileChooser.setApproveButtonText ( "Save as ICS File" );
 		fileChooser
-		    .setApproveButtonToolTipText ( "Export entries to iCalendar file" );
+				.setApproveButtonToolTipText ( "Export entries to iCalendar file" );
 		int ret = fileChooser.showOpenDialog ( this );
 		if ( ret == JFileChooser.APPROVE_OPTION ) {
 			outFile = fileChooser.getSelectedFile ();
@@ -766,17 +769,17 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		lastExportDirectory = outFile.getParentFile ();
 		if ( outFile.exists () && !outFile.canWrite () ) {
 			JOptionPane.showMessageDialog ( parent,
-			    "You do not have the proper\npermissions to write to:\n\n"
-			        + outFile.toString () + "\n\nPlease select another file.",
-			    "Save Error", JOptionPane.PLAIN_MESSAGE );
+					"You do not have the proper\npermissions to write to:\n\n"
+							+ outFile.toString () + "\n\nPlease select another file.",
+					"Save Error", JOptionPane.PLAIN_MESSAGE );
 			return;
 		}
 		if ( outFile.exists () ) {
 			if ( JOptionPane.showConfirmDialog ( parent,
-			    "Overwrite existing file?\n\n" + outFile.toString (),
-			    "Overwrite Confirm", JOptionPane.YES_NO_OPTION ) != 0 ) {
+					"Overwrite existing file?\n\n" + outFile.toString (),
+					"Overwrite Confirm", JOptionPane.YES_NO_OPTION ) != 0 ) {
 				JOptionPane.showMessageDialog ( parent, "Export canceled.",
-				    "Export canceled", JOptionPane.PLAIN_MESSAGE );
+						"Export canceled", JOptionPane.PLAIN_MESSAGE );
 				return;
 			}
 		}
@@ -792,11 +795,11 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 			writer.write ( p.toICalendar () );
 			writer.close ();
 			JOptionPane.showMessageDialog ( parent, "Exported to:\n\n"
-			    + outFile.toString (), "Export", JOptionPane.PLAIN_MESSAGE );
+					+ outFile.toString (), "Export", JOptionPane.PLAIN_MESSAGE );
 		} catch ( IOException e ) {
 			JOptionPane.showMessageDialog ( parent,
-			    "An error was encountered\nwriting to the file:\n\n"
-			        + e.getMessage (), "Save Error", JOptionPane.PLAIN_MESSAGE );
+					"An error was encountered\nwriting to the file:\n\n"
+							+ e.getMessage (), "Save Error", JOptionPane.PLAIN_MESSAGE );
 			e.printStackTrace ();
 		}
 	}
@@ -828,6 +831,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 /**
  * Create a class to use as a file filter for exporting to ics.
  */
+
 class ICSFileChooserFilter extends javax.swing.filechooser.FileFilter {
 	public boolean accept ( File f ) {
 		if ( f.isDirectory () )
