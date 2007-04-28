@@ -1,7 +1,8 @@
 k5nJournal ChangeLog
-Version: $Id: ChangeLog,v 1.1 2007-04-27 21:09:05 cknudsen Exp $
+Version: $Id: ChangeLog,v 1.2 2007-04-28 00:17:10 cknudsen Exp $
 
 Version 0.3.0 (27 Apr 2007)
+- Save and restore main window size
 - Updated build.xml to use new repository structure (k5njournal's CVS repository
   rather than the javacaltools repository)
   

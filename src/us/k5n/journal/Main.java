@@ -8,15 +8,20 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Vector;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +64,7 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.5 2007-04-27 23:34:34 cknudsen Exp $
+ * @version $Id: Main.java,v 1.6 2007-04-28 00:17:09 cknudsen Exp $
  *  
  */
 public class Main extends JFrame implements Constants, RepositoryChangeListener {
@@ -88,6 +93,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	JTextField searchTextField;
 	String searchText = null;
 	private static File lastExportDirectory = null;
+	Preferences prefs;
 
 	class DateFilterTreeNode extends DefaultMutableTreeNode {
 		public int year, month, day;
@@ -107,17 +113,18 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	}
 
 	public Main() {
-		this ( 600, 600 );
-	}
-
-	public Main(int w, int h) {
 		super ( "k5njournal" );
 		setWindowsLAF ();
 		this.parent = this;
+
 		// TODO: save user's preferred size on exit and set here
+		prefs = Preferences.userNodeForPackage ( this.getClass () );
+		int w = prefs.getInt ( "MainWindow.width", 600 );
+		int h = prefs.getInt ( "MainWindow.height", 600 );
+
 		setSize ( w, h );
 
-		setDefaultCloseOperation ( EXIT_ON_CLOSE );
+		setDefaultCloseOperation ( JFrame.EXIT_ON_CLOSE );
 		Container contentPane = getContentPane ();
 
 		// Load data
@@ -157,6 +164,22 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		handleDateFilterSelection ( 0, null );
 		// filteredJournalEntries = dataRepository.getAllEntries ();
 		// updateFilteredJournalList ();
+
+		this.addComponentListener ( new ComponentListener () {
+			public void componentHidden ( ComponentEvent ce ) {
+			}
+
+			public void componentShown ( ComponentEvent ce ) {
+			}
+
+			public void componentMoved ( ComponentEvent ce ) {
+			}
+
+			public void componentResized ( ComponentEvent ce ) {
+				prefs.putInt ( "MainWindow.width", ce.getComponent ().getWidth () );
+				prefs.putInt ( "MainWindow.height", ce.getComponent ().getHeight () );
+			}
+		} );
 
 		this.setVisible ( true );
 	}
@@ -677,7 +700,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 			UIManager
 					.setLookAndFeel ( "com.sun.java.swing.plaf.windows.WindowsLookAndFeel" );
 		} catch ( Exception e ) {
-			System.err.println ( "Unabled to load Windows UI: " + e.toString () );
+			System.out.println ( "Unable to load Windows UI: " + e.toString () );
 		}
 	}
 
