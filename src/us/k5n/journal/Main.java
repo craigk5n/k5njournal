@@ -13,8 +13,8 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -64,10 +64,11 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.7 2007-04-30 15:25:54 cknudsen Exp $
+ * @version $Id: Main.java,v 1.8 2007-04-30 15:56:36 cknudsen Exp $
  * 
  */
-public class Main extends JFrame implements Constants, RepositoryChangeListener {
+public class Main extends JFrame implements Constants, ComponentListener,
+    PropertyChangeListener, RepositoryChangeListener {
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
 	public static final String VERSION = "0.3.0 (27 Apr 2007)";
 	JFrame parent;
@@ -91,14 +92,14 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 	JButton newButton, editButton, deleteButton;
 	JMenuItem exportSelected;
 	JTextField searchTextField;
-	JSplitPane topBottomSplit = null, leftRightSplit = null;
+	JSplitPane verticalSplit = null, horizontalSplit = null;
 	String searchText = null;
 	private static File lastExportDirectory = null;
 	Preferences prefs;
 	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
 	static final String MAIN_WINDOW_WIDTH = "MainWindow.width";
 	static final String MAIN_WINDOW_VERTICAL_SPLIT_POSITION = "MainWindow.vSplitPanePosition";
-	static final String MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION = "MainWindow.vSplitPanePosition";
+	static final String MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION = "MainWindow.hSplitPanePosition";
 
 	class DateFilterTreeNode extends DefaultMutableTreeNode {
 		public int year, month, day;
@@ -156,13 +157,15 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		JPanel navArea = createJournalSelectionPanel ();
 		journalView = new JournalViewPanel ();
 
-		topBottomSplit = new JSplitPane ( JSplitPane.VERTICAL_SPLIT, navArea,
+		verticalSplit = new JSplitPane ( JSplitPane.VERTICAL_SPLIT, navArea,
 		    journalView );
-		topBottomSplit.setOneTouchExpandable ( true );
-		topBottomSplit.setResizeWeight ( 0.5 );
+		verticalSplit.setOneTouchExpandable ( true );
+		verticalSplit.setResizeWeight ( 0.5 );
 		int pos = prefs.getInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, 200 );
-		topBottomSplit.setDividerLocation ( pos );
-		contentPane.add ( topBottomSplit, BorderLayout.CENTER );
+		verticalSplit.setDividerLocation ( pos );
+		verticalSplit.addPropertyChangeListener ( this );
+		// verticalSplit.addComponentListener ( this );
+		contentPane.add ( verticalSplit, BorderLayout.CENTER );
 
 		// Populate Date JTree
 		updateDateTree ();
@@ -170,21 +173,7 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		// filteredJournalEntries = dataRepository.getAllEntries ();
 		// updateFilteredJournalList ();
 
-		this.addComponentListener ( new ComponentListener () {
-			public void componentHidden ( ComponentEvent ce ) {
-			}
-
-			public void componentShown ( ComponentEvent ce ) {
-			}
-
-			public void componentMoved ( ComponentEvent ce ) {
-			}
-
-			public void componentResized ( ComponentEvent ce ) {
-				saveWindowPreferences ();
-			}
-		} );
-
+		this.addComponentListener ( this );
 		this.setVisible ( true );
 	}
 
@@ -443,13 +432,15 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		JScrollPane journalListTableScroll = new JScrollPane ( journalListTable );
 		journalListPane.add ( journalListTableScroll, BorderLayout.CENTER );
 
-		leftRightSplit = new JSplitPane ( JSplitPane.HORIZONTAL_SPLIT, tabbedPane,
+		horizontalSplit = new JSplitPane ( JSplitPane.HORIZONTAL_SPLIT, tabbedPane,
 		    journalListPane );
-		leftRightSplit.setOneTouchExpandable ( true );
+		horizontalSplit.setOneTouchExpandable ( true );
 		int pos = prefs.getInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, 185 );
-		leftRightSplit.setDividerLocation ( pos );
+		horizontalSplit.setDividerLocation ( pos );
+		// horizontalSplit.addComponentListener ( this );
+		horizontalSplit.addPropertyChangeListener ( this );
 
-		topPanel.add ( leftRightSplit, BorderLayout.CENTER );
+		topPanel.add ( horizontalSplit, BorderLayout.CENTER );
 
 		return topPanel;
 	}
@@ -832,15 +823,35 @@ public class Main extends JFrame implements Constants, RepositoryChangeListener 
 		}
 	}
 
+	public void componentHidden ( ComponentEvent ce ) {
+	}
+
+	public void componentShown ( ComponentEvent ce ) {
+	}
+
+	public void componentMoved ( ComponentEvent ce ) {
+	}
+
+	public void componentResized ( ComponentEvent ce ) {
+		saveWindowPreferences ();
+	}
+
+	public void propertyChange ( PropertyChangeEvent pce ) {
+		// System.out.println ( "property Change: " + pce );
+		if ( pce.getPropertyName ().equals ( JSplitPane.DIVIDER_LOCATION_PROPERTY ) ) {
+			saveWindowPreferences ();
+		}
+	}
+
 	/**
 	 * Save current window width, height so we can restore on next run.
 	 */
-	protected void saveWindowPreferences () {
+	public void saveWindowPreferences () {
 		prefs.putInt ( MAIN_WINDOW_WIDTH, this.getWidth () );
 		prefs.putInt ( MAIN_WINDOW_HEIGHT, this.getHeight () );
-		prefs.putInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, topBottomSplit
+		prefs.putInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, verticalSplit
 		    .getDividerLocation () );
-		prefs.putInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, leftRightSplit
+		prefs.putInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, horizontalSplit
 		    .getDividerLocation () );
 	}
 
