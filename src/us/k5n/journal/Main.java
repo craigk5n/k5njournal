@@ -3,7 +3,6 @@ package us.k5n.journal;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -60,16 +59,19 @@ import us.k5n.ical.Journal;
 import us.k5n.ical.Summary;
 
 /**
- * Main class for k5njournal application.
+ * Main class for k5njournal application. This application makes use of the k5n
+ * iCalendar library (part of Java Calendar Tools). Its primary use is as a
+ * personal diary. However, future plans include the ability to post entries to
+ * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.11 2007-05-02 14:20:59 cknudsen Exp $
+ * @version $Id: Main.java,v 1.12 2007-05-02 20:09:37 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
     PropertyChangeListener, RepositoryChangeListener {
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
-	public static final String VERSION = "0.3.0 (27 Apr 2007)";
+	public static final String VERSION = "0.3.0 (02 May 2007)";
 	JFrame parent;
 	JLabel messageArea;
 	Repository dataRepository;
