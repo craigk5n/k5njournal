@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2005-2007 Craig Knudsen
+ *
+ * k5nJournal is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ * 
+ * A copy of the GNU Lesser General Public License can be found at www.gnu.org. 
+ * To receive a hard copy, you can write to:
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA.
+ */
+
 package us.k5n.journal;
 
 import java.text.SimpleDateFormat;
@@ -9,7 +28,7 @@ import us.k5n.ical.Date;
  * display using SimpleDateFormat.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DisplayDate.java,v 1.1 2007-04-27 20:54:39 cknudsen Exp $
+ * @version $Id: DisplayDate.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
  * 
  */
 public class DisplayDate implements Comparable {
