@@ -6,12 +6,12 @@ package us.k5n.journal;
  * class abstracts out the details of where the info saved (Windows registry,
  * etc.)
  * 
- * @version $Id: AppPreferences.java,v 1.2 2007-05-02 14:05:54 cknudsen Exp $
+ * @version $Id: AppPreferences.java,v 1.3 2007-05-02 14:06:59 cknudsen Exp $
  * @author Craig Knudsen, craig
  * @k5n.us
  */
 public class AppPreferences {
-	java.util.prefs.Preferences prefs;
+	java.util.prefs.Preferences prefs = null;
 	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
 	static final String MAIN_WINDOW_WIDTH = "MainWindow.width";
 	static final String MAIN_WINDOW_X = "MainWindow.x";
