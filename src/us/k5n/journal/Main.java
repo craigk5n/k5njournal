@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Vector;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +63,7 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.9 2007-04-30 16:01:15 cknudsen Exp $
+ * @version $Id: Main.java,v 1.10 2007-05-02 13:59:40 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -95,7 +94,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	JSplitPane verticalSplit = null, horizontalSplit = null;
 	String searchText = null;
 	private static File lastExportDirectory = null;
-	Preferences prefs;
+	AppPreferences prefs;
 	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
 	static final String MAIN_WINDOW_WIDTH = "MainWindow.width";
 	static final String MAIN_WINDOW_X = "MainWindow.x";
@@ -126,15 +125,10 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		this.parent = this;
 
 		// TODO: save user's preferred size on exit and set here
-		prefs = Preferences.userNodeForPackage ( this.getClass () );
-		int w = prefs.getInt ( MAIN_WINDOW_WIDTH, 600 );
-		int h = prefs.getInt ( MAIN_WINDOW_HEIGHT, 600 );
+		prefs = AppPreferences.getInstance ();
 
-		setSize ( w, h );
-
-		int x = prefs.getInt ( MAIN_WINDOW_X, 25 );
-		int y = prefs.getInt ( MAIN_WINDOW_Y, 25 );
-		this.setLocation ( x, y );
+		setSize ( prefs.getMainWindowWidth (), prefs.getMainWindowHeight () );
+		this.setLocation ( prefs.getMainWindowX (), prefs.getMainWindowY () );
 
 		setDefaultCloseOperation ( JFrame.EXIT_ON_CLOSE );
 		Container contentPane = getContentPane ();
@@ -167,8 +161,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		    journalView );
 		verticalSplit.setOneTouchExpandable ( true );
 		verticalSplit.setResizeWeight ( 0.5 );
-		int pos = prefs.getInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, 200 );
-		verticalSplit.setDividerLocation ( pos );
+		verticalSplit.setDividerLocation ( prefs
+		    .getMainWindowVerticalSplitPosition () );
 		verticalSplit.addPropertyChangeListener ( this );
 		// verticalSplit.addComponentListener ( this );
 		contentPane.add ( verticalSplit, BorderLayout.CENTER );
@@ -441,8 +435,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		horizontalSplit = new JSplitPane ( JSplitPane.HORIZONTAL_SPLIT, tabbedPane,
 		    journalListPane );
 		horizontalSplit.setOneTouchExpandable ( true );
-		int pos = prefs.getInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, 185 );
-		horizontalSplit.setDividerLocation ( pos );
+		horizontalSplit.setDividerLocation ( prefs
+		    .getMainWindowHorizontalSplitPosition () );
 		// horizontalSplit.addComponentListener ( this );
 		horizontalSplit.addPropertyChangeListener ( this );
 
@@ -855,13 +849,13 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	 * Save current window width, height so we can restore on next run.
 	 */
 	public void saveWindowPreferences () {
-		prefs.putInt ( MAIN_WINDOW_X, this.getX () );
-		prefs.putInt ( MAIN_WINDOW_Y, this.getY () );
-		prefs.putInt ( MAIN_WINDOW_WIDTH, this.getWidth () );
-		prefs.putInt ( MAIN_WINDOW_HEIGHT, this.getHeight () );
-		prefs.putInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, verticalSplit
+		prefs.setMainWindowX ( this.getX () );
+		prefs.setMainWindowY ( this.getY () );
+		prefs.setMainWindowWidth ( this.getWidth () );
+		prefs.setMainWindowHeight ( this.getHeight () );
+		prefs.setMainWindowVerticalSplitPosition ( verticalSplit
 		    .getDividerLocation () );
-		prefs.putInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, horizontalSplit
+		prefs.setMainWindowHorizontalSplitPosition ( horizontalSplit
 		    .getDividerLocation () );
 	}
 
