@@ -1,12 +1,13 @@
 package us.k5n.journal;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -31,9 +32,9 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.1 2007-04-27 20:54:39 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.2 2007-05-02 14:25:16 cknudsen Exp $
  */
-public class EditWindow extends JDialog {
+public class EditWindow extends JDialog implements ComponentListener {
 	Repository repo;
 	Journal journal;
 	Sequence seq = null;
@@ -42,11 +43,13 @@ public class EditWindow extends JDialog {
 	JTextField categories;
 	JLabel startDate;
 	JTextArea description;
+	AppPreferences prefs;
 
-	public EditWindow(JFrame parent, Dimension preferredSize, Repository repo,
-	    Journal journal) {
+	public EditWindow(JFrame parent, Repository repo, Journal journal) {
 		super ( parent );
-		super.setSize ( preferredSize );
+		prefs = AppPreferences.getInstance ();
+		super.setSize ( prefs.getEditWindowWidth (), prefs.getEditWindowHeight () );
+		super.setLocation ( prefs.getEditWindowX (), prefs.getEditWindowY () );
 		// TODO: don't make this modal once we add code to check
 		// things like deleting this entry in the main window, etc.
 		// super.setModal ( true );
@@ -76,6 +79,7 @@ public class EditWindow extends JDialog {
 
 		createWindow ();
 		setVisible ( true );
+		this.addComponentListener ( this );
 	}
 
 	private void createWindow () {
@@ -213,4 +217,30 @@ public class EditWindow extends JDialog {
 		// TODO: check for unsaved changes
 		this.dispose ();
 	}
+
+	public void componentHidden ( ComponentEvent ce ) {
+	}
+
+	public void componentShown ( ComponentEvent ce ) {
+	}
+
+	// Handle moving of main window
+	public void componentMoved ( ComponentEvent ce ) {
+		saveWindowPreferences ();
+	}
+
+	public void componentResized ( ComponentEvent ce ) {
+		saveWindowPreferences ();
+	}
+
+	/**
+	 * Save current window width, height so we can restore on next run.
+	 */
+	public void saveWindowPreferences () {
+		prefs.setEditWindowWidth ( this.getWidth () );
+		prefs.setEditWindowHeight ( this.getHeight () );
+		prefs.setEditWindowX ( this.getX () );
+		prefs.setEditWindowY ( this.getY () );
+	}
+
 }

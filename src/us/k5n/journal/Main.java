@@ -63,7 +63,7 @@ import us.k5n.ical.Summary;
  * Main class for k5njournal application.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.10 2007-05-02 13:59:40 cknudsen Exp $
+ * @version $Id: Main.java,v 1.11 2007-05-02 14:20:59 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -183,8 +183,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		    "New..." );
 		newButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
-				new EditWindow ( parent, new Dimension ( 500, 500 ), dataRepository,
-				    null );
+				new EditWindow ( parent, dataRepository, null );
 			}
 		} );
 		toolbar.add ( newButton );
@@ -200,8 +199,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 				    && ind < filteredSearchedJournalEntries.size () ) {
 					DisplayDate dd = (DisplayDate) journalListTable.getValueAt ( ind, 0 );
 					Journal j = (Journal) dd.getUserData ();
-					new EditWindow ( parent, new Dimension ( 500, 500 ), dataRepository,
-					    j );
+					new EditWindow ( parent, dataRepository, j );
 				}
 			}
 		} );

@@ -6,18 +6,24 @@ package us.k5n.journal;
  * class abstracts out the details of where the info saved (Windows registry,
  * etc.)
  * 
- * @version $Id: AppPreferences.java,v 1.3 2007-05-02 14:06:59 cknudsen Exp $
+ * @version $Id: AppPreferences.java,v 1.4 2007-05-02 14:20:59 cknudsen Exp $
  * @author Craig Knudsen, craig
  * @k5n.us
  */
 public class AppPreferences {
 	java.util.prefs.Preferences prefs = null;
-	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
 	static final String MAIN_WINDOW_WIDTH = "MainWindow.width";
+	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
 	static final String MAIN_WINDOW_X = "MainWindow.x";
 	static final String MAIN_WINDOW_Y = "MainWindow.y";
 	static final String MAIN_WINDOW_VERTICAL_SPLIT_POSITION = "MainWindow.vSplitPanePosition";
 	static final String MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION = "MainWindow.hSplitPanePosition";
+
+	static final String EDIT_WINDOW_WIDTH = "EditWindow.width";
+	static final String EDIT_WINDOW_HEIGHT = "EditWindow.height";
+	static final String EDIT_WINDOW_X = "EditWindow.x";
+	static final String EDIT_WINDOW_Y = "EditWindow.y";
+
 	private static AppPreferences instance = null;
 
 	public AppPreferences() {
@@ -153,6 +159,82 @@ public class AppPreferences {
 	 */
 	public void setMainWindowY ( int mainWindowY ) {
 		prefs.putInt ( MAIN_WINDOW_Y, mainWindowY );
+	}
+
+	/**
+	 * Get edit window width
+	 * 
+	 * @return
+	 */
+	public int getEditWindowWidth () {
+		return prefs.getInt ( EDIT_WINDOW_WIDTH, 600 );
+	}
+
+	/**
+	 * Set edit window width
+	 * 
+	 * @param editWindowWidth
+	 *          width of edit window (in pixels)
+	 */
+	public void setEditWindowWidth ( int editWindowWidth ) {
+		prefs.putInt ( EDIT_WINDOW_WIDTH, editWindowWidth );
+	}
+
+	/**
+	 * Get edit window height
+	 * 
+	 * @return
+	 */
+	public int getEditWindowHeight () {
+		return prefs.getInt ( EDIT_WINDOW_HEIGHT, 600 );
+	}
+
+	/**
+	 * Set edit window width
+	 * 
+	 * @param editWindowWidth
+	 *          width of edit window (in pixels)
+	 */
+	public void setEditWindowHeight ( int editWindowHeight ) {
+		prefs.putInt ( EDIT_WINDOW_HEIGHT, editWindowHeight );
+	}
+
+	/**
+	 * Get the edit window X position
+	 * 
+	 * @return
+	 */
+	public int getEditWindowX () {
+		return prefs.getInt ( EDIT_WINDOW_X, 15 );
+	}
+
+	/**
+	 * Set the edit window X position
+	 * 
+	 * @param editWindowX
+	 *          The X position of the main window
+	 */
+	public void setEditWindowX ( int editWindowX ) {
+		prefs.putInt ( EDIT_WINDOW_X, editWindowX );
+	}
+
+	/**
+	 * Get the edit window y position
+	 * 
+	 * @return
+	 */
+	public int getEditWindowY () {
+		return prefs.getInt ( EDIT_WINDOW_Y, 15 );
+	}
+
+	/**
+	 * Set the edit window Y position
+	 * 
+	 * @param editWindowY
+	 *          The Y position of the main window
+	 */
+	public void setEditWindowY ( int editWindowY ) {
+		prefs.putInt ( EDIT_WINDOW_Y, editWindowY );
 	}
 
 }
