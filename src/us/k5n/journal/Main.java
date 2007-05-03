@@ -84,7 +84,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.13 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: Main.java,v 1.14 2007-05-03 11:50:45 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -200,8 +200,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 	JToolBar createToolBar () {
 		JToolBar toolbar = new JToolBar ();
-		newButton = makeNavigationButton ( null, "new", "Add new Journal entry",
-		    "New..." );
+		newButton = makeNavigationButton ( "New24.gif", "new",
+		    "Add new Journal entry", "New..." );
 		newButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				new EditWindow ( parent, dataRepository, null );
@@ -686,10 +686,15 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	protected JButton makeNavigationButton ( String imageName,
 	    String actionCommand, String toolTipText, String altText ) {
 		JButton button;
+		String imgLocation = null;
+		URL imageURL = null;
 
 		// Look for the image.
-		String imgLocation = "images/" + imageName;
-		URL imageURL = this.getClass ().getResource ( imgLocation );
+		imgLocation = "images/" + imageName;
+		if ( imageName != null ) {
+			imgLocation = "images/" + imageName;
+			imageURL = this.getClass ().getResource ( imgLocation );
+		}
 
 		if ( imageURL != null ) { // image found
 			button = new JButton ();
