@@ -22,6 +22,7 @@ package us.k5n.journal;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -84,7 +85,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.14 2007-05-03 11:50:45 cknudsen Exp $
+ * @version $Id: Main.java,v 1.15 2007-05-03 12:09:18 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -209,8 +210,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		} );
 		toolbar.add ( newButton );
 
-		editButton = makeNavigationButton ( null, "edit", "Edit Journal entry",
-		    "Edit..." );
+		editButton = makeNavigationButton ( "Edit24.gif", "edit",
+		    "Edit Journal entry", "Edit..." );
 		toolbar.add ( editButton );
 		editButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
@@ -225,8 +226,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			}
 		} );
 
-		deleteButton = makeNavigationButton ( null, "delete",
-		    "deleteButton Journal entry", "Delete" );
+		deleteButton = makeNavigationButton ( "Delete24.gif", "delete",
+		    "Delete Journal entry", "Delete" );
 		toolbar.add ( deleteButton );
 		deleteButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
@@ -394,7 +395,12 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		JPanel searchPanel = new JPanel ();
 		searchPanel.setBorder ( BorderFactory.createEmptyBorder ( 4, 4, 4, 4 ) );
 		searchPanel.setLayout ( new BorderLayout () );
-		searchPanel.add ( new JLabel ( "Search: " ), BorderLayout.WEST );
+		URL imageURL = this.getClass ().getClassLoader ().getResource (
+		    "images/Search24.gif" );
+		ImageIcon icon = new ImageIcon ( imageURL );
+		JLabel searchLabel = new JLabel (  );
+		searchLabel.setIcon ( icon );
+		searchPanel.add ( searchLabel, BorderLayout.WEST );
 		searchTextField = new SearchTextField ();
 		searchTextField.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
@@ -693,11 +699,11 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		imgLocation = "images/" + imageName;
 		if ( imageName != null ) {
 			imgLocation = "images/" + imageName;
-			imageURL = this.getClass ().getResource ( imgLocation );
+			imageURL = this.getClass ().getClassLoader ().getResource ( imgLocation );
 		}
 
 		if ( imageURL != null ) { // image found
-			button = new JButton ();
+			button = new JButton ( altText );
 			button.setIcon ( new ImageIcon ( imageURL, altText ) );
 		} else {
 			// no image found
@@ -706,8 +712,17 @@ public class Main extends JFrame implements Constants, ComponentListener,
 				System.err.println ( "Resource not found: " + imgLocation );
 		}
 
+		button.setVerticalTextPosition ( JButton.BOTTOM );
+		button.setHorizontalTextPosition ( JButton.CENTER );
 		button.setActionCommand ( actionCommand );
 		button.setToolTipText ( toolTipText );
+
+		// Decrease font size by 2 if we have an icon
+		if ( imageURL != null ) {
+			Font f = button.getFont ();
+			Font newFont = new Font ( f.getFamily (), Font.PLAIN, f.getSize () - 2 );
+			button.setFont ( newFont );
+		}
 
 		return button;
 	}
