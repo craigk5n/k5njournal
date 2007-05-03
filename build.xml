@@ -1,5 +1,5 @@
 <!-- ant build.xml file for k5n ical lib -->
-<!-- $Id: build.xml,v 1.3 2007-05-03 11:12:41 cknudsen Exp $ -->
+<!-- $Id: build.xml,v 1.4 2007-05-03 11:42:03 cknudsen Exp $ -->
 
 <project name="k5njournal" default="dist" basedir=".">
   <description>Top-level build file for k5nJournal</description>
@@ -50,6 +50,16 @@
     <manifest>
        <attribute name="Main-Class" value="us.k5n.journal.Main"/>
     </manifest>
+    </jar>
+  </target>
+
+
+  <!-- This target can be useful inside Eclipse when you are having
+       problems loading the images.  Just use ant to build a separate
+       jar file for the images. -->
+  <target name="imagejar" depends="copyimages">
+    <jar jarfile="lib/k5njournal-images.jar" basedir="${build}"
+      includes="images/**">
     </jar>
   </target>
 
