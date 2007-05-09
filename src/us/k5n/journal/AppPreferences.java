@@ -25,7 +25,7 @@ package us.k5n.journal;
  * class abstracts out the details of where the info saved (Windows registry,
  * etc.)
  * 
- * @version $Id: AppPreferences.java,v 1.5 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: AppPreferences.java,v 1.6 2007-05-09 00:55:34 cknudsen Exp $
  * @author Craig Knudsen, craig
  * @k5n.us
  */
@@ -62,7 +62,7 @@ public class AppPreferences {
 	 * @return
 	 */
 	public int getMainWindowHeight () {
-		return prefs.getInt ( MAIN_WINDOW_WIDTH, 600 );
+		return prefs.getInt ( MAIN_WINDOW_HEIGHT, 600 );
 	}
 
 	/**
