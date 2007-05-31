@@ -5,6 +5,7 @@ Version:      0.3.0
 URL:          http://k5njournal.sourceforge.net
 Author:       Craig Knudsen, craig [< at >] k5n.us
 License:      GNU GPL
+Requires:     Java 1.5 or later
 
 ---------------------------------------------------------------------------
                          BUILDING
@@ -43,3 +44,11 @@ the GNU General Public License.
 For information about this license:
 
 	http://www.gnu.org/licenses/gpl.html
+	
+This tool makes use of and include Joda Time:
+
+	http://www.joda.org/
+	
+Joda Time is licensed under the Apache License:
+
+	http://joda-time.sourceforge.net/license.html
