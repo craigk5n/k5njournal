@@ -1,5 +1,8 @@
 k5nJournal ChangeLog
-Version: $Id: ChangeLog,v 1.5 2007-07-10 14:15:58 cknudsen Exp $
+Version: $Id: ChangeLog,v 1.6 2007-09-20 23:59:20 cknudsen Exp $
+
+Version 0.3.1 (?? ??? 2007)
+- Fixed exception when images for buttons are not found.
 
 Version 0.3.0 (03 May 2007)
 - Added icons to main toolbar (new, edit, delete)

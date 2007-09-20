@@ -85,7 +85,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.15 2007-05-03 12:09:18 cknudsen Exp $
+ * @version $Id: Main.java,v 1.16 2007-09-20 23:59:20 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -397,8 +397,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		searchPanel.setLayout ( new BorderLayout () );
 		URL imageURL = this.getClass ().getClassLoader ().getResource (
 		    "images/Search24.gif" );
-		ImageIcon icon = new ImageIcon ( imageURL );
-		JLabel searchLabel = new JLabel (  );
+		ImageIcon icon = imageURL == null ? null : new ImageIcon ( imageURL );
+		JLabel searchLabel = new JLabel ();
 		searchLabel.setIcon ( icon );
 		searchPanel.add ( searchLabel, BorderLayout.WEST );
 		searchTextField = new SearchTextField ();
