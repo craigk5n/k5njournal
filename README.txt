@@ -1,7 +1,7 @@
                            k5nJournal
 ****************************************************************************
 
-Version:      0.3.0
+Version:      0.3.1
 URL:          http://k5njournal.sourceforge.net
 Author:       Craig Knudsen, craig [< at >] k5n.us
 License:      GNU GPL
