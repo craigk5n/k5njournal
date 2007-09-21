@@ -95,7 +95,7 @@ public class DateTimeSelectionDialog extends JDialog {
 		int[] hProportions = { 1, 3 };
 
 		ProportionalLayout vLayout = new ProportionalLayout ( vProportions,
-		    ProportionalLayout.VERITCAL_LAYOUT );
+		    ProportionalLayout.VERTICAL_LAYOUT );
 		JPanel panel = new JPanel ();
 		panel.setLayout ( vLayout );
 

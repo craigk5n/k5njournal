@@ -37,7 +37,7 @@ public class ProportionalLayout implements LayoutManager {
 	private int total; // The total of the proportions
 	private int num; // The number in the array
 	public final static int HORIZONTAL_LAYOUT = 1;
-	public final static int VERITCAL_LAYOUT = 2;
+	public final static int VERTICAL_LAYOUT = 2;
 	private int orientation;
 
 	/**

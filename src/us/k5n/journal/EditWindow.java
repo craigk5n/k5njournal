@@ -20,14 +20,15 @@
 package us.k5n.journal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,6 +41,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import us.k5n.ical.Attachment;
 import us.k5n.ical.Categories;
 import us.k5n.ical.Date;
 import us.k5n.ical.Description;
@@ -51,7 +53,7 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.3 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.4 2007-09-21 12:22:51 cknudsen Exp $
  */
 public class EditWindow extends JDialog implements ComponentListener {
 	Repository repo;
@@ -60,6 +62,8 @@ public class EditWindow extends JDialog implements ComponentListener {
 	JFrame parent;
 	JTextField subject;
 	JTextField categories;
+	JTextField attachmentsText;
+	Vector attachments;
 	JLabel startDate;
 	JTextArea description;
 	AppPreferences prefs;
@@ -96,6 +100,9 @@ public class EditWindow extends JDialog implements ComponentListener {
 		if ( this.journal.getCategories () == null )
 			this.journal.setCategories ( new Categories () );
 
+		if ( this.journal.getAttachments () != null )
+			this.attachments = this.journal.getAttachments ();
+
 		createWindow ();
 		setVisible ( true );
 		this.addComponentListener ( this );
@@ -129,13 +136,14 @@ public class EditWindow extends JDialog implements ComponentListener {
 
 		JPanel upperPanel = new JPanel ();
 		upperPanel.setBorder ( BorderFactory.createEtchedBorder () );
-		GridLayout grid = new GridLayout ( 3, 1 );
-		grid.setHgap ( 15 );
-		grid.setVgap ( 5 );
-		upperPanel.setLayout ( grid );
+		int[] vproportions = { 25, 25, 25, 25 };
+		upperPanel.setLayout ( new ProportionalLayout ( vproportions,
+		    ProportionalLayout.VERTICAL_LAYOUT ) );
+
 		int[] proportions = { 20, 80 };
 
 		JPanel subjectPanel = new JPanel ();
+		subjectPanel.setBorder ( BorderFactory.createEmptyBorder ( 2, 2, 2, 2 ) );
 		subjectPanel.setLayout ( new ProportionalLayout ( proportions,
 		    ProportionalLayout.HORIZONTAL_LAYOUT ) );
 		JLabel prompt = new JLabel ( "Subject: " );
@@ -148,6 +156,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 		upperPanel.add ( subjectPanel );
 
 		JPanel datePanel = new JPanel ();
+		datePanel.setBorder ( BorderFactory.createEmptyBorder ( 2, 2, 2, 2 ) );
 		datePanel.setLayout ( new ProportionalLayout ( proportions,
 		    ProportionalLayout.HORIZONTAL_LAYOUT ) );
 		prompt = new JLabel ( "Date: " );
@@ -173,12 +182,12 @@ public class EditWindow extends JDialog implements ComponentListener {
 				}
 			}
 		} );
-		dateSel.setMargin ( new Insets ( 0, 5, 0, 5 ) );
 		subDatePanel.add ( dateSel );
 		datePanel.add ( subDatePanel );
 		upperPanel.add ( datePanel );
 
 		JPanel catPanel = new JPanel ();
+		catPanel.setBorder ( BorderFactory.createEmptyBorder ( 2, 2, 2, 2 ) );
 		catPanel.setLayout ( new ProportionalLayout ( proportions,
 		    ProportionalLayout.HORIZONTAL_LAYOUT ) );
 		prompt = new JLabel ( "Categories: " );
@@ -189,6 +198,32 @@ public class EditWindow extends JDialog implements ComponentListener {
 			categories.setText ( journal.getCategories ().getValue () );
 		catPanel.add ( categories );
 		upperPanel.add ( catPanel );
+
+		JPanel attachmentPanel = new JPanel ();
+		attachmentPanel.setBorder ( BorderFactory.createEmptyBorder ( 2, 2, 2, 2 ) );
+		attachmentPanel.setLayout ( new ProportionalLayout ( proportions,
+		    ProportionalLayout.HORIZONTAL_LAYOUT ) );
+		prompt = new JLabel ( "Attachments: " );
+		prompt.setHorizontalAlignment ( SwingConstants.RIGHT );
+		attachmentPanel.add ( prompt );
+		JPanel subAttachmentPanel = new JPanel ();
+		subAttachmentPanel.setLayout ( new BorderLayout () );
+		JPanel subsub = new JPanel ();
+		subsub.setLayout ( new FlowLayout () );
+		JButton attachmentSel = new JButton ( "..." );
+		attachmentSel.addActionListener ( new ActionListener () {
+			public void actionPerformed ( ActionEvent event ) {
+				chooseAttachments ();
+			}
+		} );
+		subsub.add ( attachmentSel );
+		subAttachmentPanel.add ( subsub, BorderLayout.EAST );
+		attachmentsText = new JTextField ();
+		attachmentsText.setEditable ( false );
+		attachmentsText.setText ( getAttachmentsLabel ( this.attachments ) );
+		subAttachmentPanel.add ( attachmentsText, BorderLayout.CENTER );
+		attachmentPanel.add ( subAttachmentPanel );
+		upperPanel.add ( attachmentPanel );
 
 		allButButtons.add ( upperPanel, BorderLayout.NORTH );
 
@@ -209,6 +244,18 @@ public class EditWindow extends JDialog implements ComponentListener {
 		getContentPane ().add ( allButButtons, BorderLayout.CENTER );
 	}
 
+	String getAttachmentsLabel ( Vector list ) {
+		StringBuffer sb = new StringBuffer ();
+		for ( int i = 0; list != null && i < list.size (); i++ ) {
+			Attachment a = (Attachment) list.elementAt ( i );
+			String filename = a.getFilename ();
+			if ( i > 0 )
+				sb.append ( ", " );
+			sb.append ( filename == null ? "Unnamed-" + ( i + 1 ) : filename );
+		}
+		return sb.toString ();
+	}
+
 	void save () {
 		// Note: LAST-MODIFIED gets updated by call to saveJournal
 		if ( seq != null ) {
@@ -227,9 +274,11 @@ public class EditWindow extends JDialog implements ComponentListener {
 		this.dispose ();
 	}
 
-	void chooseDate () {
-		DateTimeSelectionDialog dts = new DateTimeSelectionDialog ( parent, journal
-		    .getStartDate () );
+	void chooseAttachments () {
+		Vector newAttachments = AttachmentDialog.showAttachmentDialog ( parent,
+		    this.attachments );
+		if ( newAttachments != null )
+			this.attachments = newAttachments;
 	}
 
 	void close () {
