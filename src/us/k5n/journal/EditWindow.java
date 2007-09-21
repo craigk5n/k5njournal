@@ -53,7 +53,7 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.4 2007-09-21 12:22:51 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.5 2007-09-21 20:48:24 cknudsen Exp $
  */
 public class EditWindow extends JDialog implements ComponentListener {
 	Repository repo;
@@ -266,6 +266,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 			this.journal.getDescription ().setValue ( description.getText () );
 			this.journal.getSummary ().setValue ( subject.getText ().trim () );
 			this.journal.getCategories ().setValue ( categories.getText ().trim () );
+			this.journal.setAttachments ( this.attachments );
 			repo.saveJournal ( this.journal );
 		} catch ( IOException e2 ) {
 			// TODO: add error handler that pops up a window here
@@ -277,8 +278,11 @@ public class EditWindow extends JDialog implements ComponentListener {
 	void chooseAttachments () {
 		Vector newAttachments = AttachmentDialog.showAttachmentDialog ( parent,
 		    this.attachments );
-		if ( newAttachments != null )
+		if ( newAttachments != null ) {
 			this.attachments = newAttachments;
+			// update display to show new attachments
+			attachmentsText.setText ( getAttachmentsLabel ( this.attachments ) );
+		}
 	}
 
 	void close () {
