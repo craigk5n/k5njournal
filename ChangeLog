@@ -1,11 +1,11 @@
 k5nJournal ChangeLog
-Version: $Id: ChangeLog,v 1.7 2007-09-21 20:51:46 cknudsen Exp $
+Version: $Id: ChangeLog,v 1.8 2007-09-22 02:56:28 cknudsen Exp $
 
 Version 0.3.1 (?? ??? 2007)
 - Added support for attachments to journal entries.  Attachments
   are stored inline within the iCalendar data file.
-- Added built-in attachment viewers for plain/text, image/jpeg and
-  image/gif files.
+- Added built-in attachment viewers for plain/text, image/jpeg,
+  image/png and image/gif files.
 - Fixed exception when images for buttons are not found.
 
 Version 0.3.0 (03 May 2007)

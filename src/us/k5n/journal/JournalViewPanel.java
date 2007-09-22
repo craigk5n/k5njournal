@@ -185,7 +185,8 @@ public class JournalViewPanel extends JPanel {
 			JScrollPane scroll = new JScrollPane ( text );
 			panel.add ( scroll, BorderLayout.CENTER );
 		} else if ( type.equalsIgnoreCase ( "image/jpeg" )
-		    || type.equalsIgnoreCase ( "image/gif" ) ) {
+		    || type.equalsIgnoreCase ( "image/gif" )
+		    || type.equalsIgnoreCase ( "image/png" ) ) {
 			// Image viewer for JPEG/GIF images
 			String val = a.getValue ();
 			byte[] bytes = new byte[val.length ()];
@@ -255,8 +256,7 @@ class IV extends JPanel {
 	}
 
 	protected JPanel getUIPanel () {
-		final JButton larger = new JButton ( "+" ), smaller = new JButton (
-		    "-" );
+		final JButton larger = new JButton ( "+" ), smaller = new JButton ( "-" );
 		ActionListener l = new ActionListener () {
 			public void actionPerformed ( ActionEvent e ) {
 				JButton button = (JButton) e.getSource ();
