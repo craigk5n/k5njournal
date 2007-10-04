@@ -173,11 +173,7 @@ public class JournalViewPanel extends JPanel {
 			panel.add ( new JLabel ( "No viewer (unknown format type)" ) );
 		} else if ( type.equalsIgnoreCase ( "text/plain" ) ) {
 			String val = a.getValue ();
-			byte[] bytes = new byte[val.length ()];
-			char[] chars = val.toCharArray ();
-			for ( int i = 0; i < chars.length; i++ ) {
-				bytes[i] = (byte) chars[i];
-			}
+			byte[] bytes = val.getBytes ();
 			byte[] decoded = Base64.decodeBase64 ( bytes );
 			String decStr = new String ( decoded );
 			JTextArea text = new JTextArea ( decStr );
@@ -189,11 +185,7 @@ public class JournalViewPanel extends JPanel {
 		    || type.equalsIgnoreCase ( "image/png" ) ) {
 			// Image viewer for JPEG/GIF images
 			String val = a.getValue ();
-			byte[] bytes = new byte[val.length ()];
-			char[] chars = val.toCharArray ();
-			for ( int i = 0; i < chars.length; i++ ) {
-				bytes[i] = (byte) chars[i];
-			}
+			byte[] bytes = val.getBytes ();
 			byte[] decoded = Base64.decodeBase64 ( bytes );
 			IV image = new IV ( decoded );
 			JScrollPane scroll = new JScrollPane ( image );
