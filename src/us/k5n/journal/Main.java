@@ -39,6 +39,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,7 +86,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.16 2007-09-20 23:59:20 cknudsen Exp $
+ * @version $Id: Main.java,v 1.17 2009-04-06 15:07:04 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -607,6 +608,9 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	 */
 	void updateFilteredJournalList () {
 		filteredSearchedJournalEntries = filterSearchText ( filteredJournalEntries );
+		// Sort by date...
+		filteredSearchedJournalEntries = SortableJournal
+		    .sortJournals ( filteredSearchedJournalEntries );
 		journalListTableModel
 		    .setRowCount ( filteredSearchedJournalEntries == null ? 0
 		        : filteredSearchedJournalEntries.size () );
@@ -938,5 +942,35 @@ class ICSFileChooserFilter extends javax.swing.filechooser.FileFilter {
 
 	public String getDescription () {
 		return "*.ics (iCalendar Files)";
+	}
+}
+
+class SortableJournal implements Comparable {
+	Journal journal;
+
+	public SortableJournal(Journal j) {
+		this.journal = j;
+	}
+
+	public int compareTo ( Object o ) {
+		SortableJournal j = (SortableJournal) o;
+		return j.journal.getDtstamp ().compareTo ( this.journal.getDtstamp () );
+	}
+
+	public static Vector sortJournals ( Vector journals ) {
+		Vector sjs = new Vector ();
+		for ( int i = 0; i < journals.size (); i++ ) {
+			Journal j = (Journal) journals.elementAt ( i );
+			SortableJournal sj = new SortableJournal ( j );
+			sjs.addElement ( sj );
+		}
+		Collections.sort ( sjs );
+		Vector ret = new Vector ();
+		for ( int i = 0; i < sjs.size (); i++ ) {
+			SortableJournal sj = (SortableJournal) sjs.elementAt ( i );
+			ret.addElement ( sj.journal );
+		}
+		return ret;
+
 	}
 }
