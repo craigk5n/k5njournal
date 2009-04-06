@@ -20,9 +20,7 @@
 package us.k5n.journal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -53,7 +51,7 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.5 2007-09-21 20:48:24 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.6 2009-04-06 23:27:23 cknudsen Exp $
  */
 public class EditWindow extends JDialog implements ComponentListener {
 	Repository repo;
