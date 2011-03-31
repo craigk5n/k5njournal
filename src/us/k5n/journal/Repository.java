@@ -37,26 +37,24 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.3 2011-03-31 02:01:36 cknudsen Exp $
  */
 public class Repository {
 	File directory;
-	Vector dataFiles;
-	HashMap dataFileHash;
+	Vector<DataFile> dataFiles;
+	HashMap<String, DataFile> dataFileHash;
 	int parseErrorCount = 0;
 	int journalCount = 0;
 	Date[] listOfDates;
-	HashMap uidHash;
-	private Vector changeListeners;
-	private Vector categories; // Vector of String categories
+	private Vector<RepositoryChangeListener> changeListeners;
+	private Vector<String> categories; // Vector of String categories
 
 	public Repository(File dir, boolean strictParsing) {
 		this.directory = dir;
-		this.dataFiles = new Vector ();
-		this.dataFileHash = new HashMap ();
-		this.uidHash = new HashMap ();
-		this.changeListeners = new Vector ();
-		this.categories = new Vector ();
+		this.dataFiles = new Vector<DataFile> ();
+		this.dataFileHash = new HashMap<String, DataFile> ();
+		this.changeListeners = new Vector<RepositoryChangeListener> ();
+		this.categories = new Vector<String> ();
 
 		// Load all files.
 		File[] files = this.directory.listFiles ( new IcsFileFilter () );
@@ -82,7 +80,7 @@ public class Repository {
 	public DataFile findDataFile ( Journal j ) {
 		String YMD = Utils.DateToYYYYMMDD ( j.getStartDate () );
 		String fileName = YMD + ".ics";
-		DataFile dataFile = (DataFile) this.dataFileHash.get ( fileName );
+		DataFile dataFile = this.dataFileHash.get ( fileName );
 		return dataFile;
 	}
 
@@ -94,8 +92,8 @@ public class Repository {
 	public int[] getYears () {
 		if ( listOfDates == null )
 			return null;
-		HashMap h = new HashMap ();
-		Vector years = new Vector ();
+		HashMap<Integer, Integer> h = new HashMap<Integer, Integer> ();
+		Vector<Integer> years = new Vector<Integer> ();
 		for ( int i = 0; i < listOfDates.length; i++ ) {
 			Integer ival = new Integer ( listOfDates[i].getYear () );
 			if ( !h.containsKey ( ival ) ) {
@@ -105,7 +103,7 @@ public class Repository {
 		}
 		int[] ret = new int[years.size ()];
 		for ( int i = 0; i < years.size (); i++ )
-			ret[i] = ( (Integer) years.elementAt ( i ) ).intValue ();
+			ret[i] = years.elementAt ( i ).intValue ();
 		return ret;
 	}
 
@@ -120,8 +118,8 @@ public class Repository {
 	public int[] getMonthsForYear ( int year ) {
 		if ( listOfDates == null )
 			return null;
-		HashMap h = new HashMap ();
-		Vector months = new Vector ();
+		HashMap<Integer,Integer> h = new HashMap<Integer,Integer> ();
+		Vector<Integer> months = new Vector<Integer> ();
 		for ( int i = 0; i < listOfDates.length; i++ ) {
 			if ( listOfDates[i].getYear () == year ) {
 				Integer ival = new Integer ( listOfDates[i].getMonth () );
@@ -133,7 +131,7 @@ public class Repository {
 		}
 		int[] ret = new int[months.size ()];
 		for ( int i = 0; i < months.size (); i++ )
-			ret[i] = ( (Integer) months.elementAt ( i ) ).intValue ();
+			ret[i] = months.elementAt ( i ).intValue ();
 		return ret;
 	}
 
@@ -146,12 +144,12 @@ public class Repository {
 	 *          The month (Jan=1, Feb=2, etc.)
 	 * @return
 	 */
-	public Vector getEntriesByMonth ( int year, int month ) {
+	public Vector<Journal> getEntriesByMonth ( int year, int month ) {
 		if ( listOfDates == null )
 			return null;
-		Vector ret = new Vector ();
+		Vector<Journal> ret = new Vector<Journal> ();
 		for ( int i = 0; i < dataFiles.size (); i++ ) {
-			DataFile df = (DataFile) dataFiles.elementAt ( i );
+			DataFile df = dataFiles.elementAt ( i );
 			for ( int j = 0; j < df.getJournalCount (); j++ ) {
 				Journal journal = df.journalEntryAt ( j );
 				if ( journal.getStartDate () == null ) {
@@ -174,12 +172,12 @@ public class Repository {
 	 *          The 4-digit year
 	 * @return
 	 */
-	public Vector getEntriesByYear ( int year ) {
+	public Vector<Journal> getEntriesByYear ( int year ) {
 		if ( listOfDates == null )
 			return null;
-		Vector ret = new Vector ();
+		Vector<Journal> ret = new Vector<Journal> ();
 		for ( int i = 0; i < dataFiles.size (); i++ ) {
-			DataFile df = (DataFile) dataFiles.elementAt ( i );
+			DataFile df = dataFiles.elementAt ( i );
 			for ( int j = 0; j < df.getJournalCount (); j++ ) {
 				Journal journal = df.journalEntryAt ( j );
 				if ( journal.getStartDate () == null ) {
@@ -199,12 +197,12 @@ public class Repository {
 	 * 
 	 * @return
 	 */
-	public Vector getAllEntries () {
+	public Vector<Journal> getAllEntries () {
 		if ( listOfDates == null )
 			return null;
-		Vector ret = new Vector ();
+		Vector<Journal> ret = new Vector<Journal> ();
 		for ( int i = 0; i < dataFiles.size (); i++ ) {
-			DataFile df = (DataFile) dataFiles.elementAt ( i );
+			DataFile df = dataFiles.elementAt ( i );
 			for ( int j = 0; j < df.getJournalCount (); j++ ) {
 				Journal journal = df.journalEntryAt ( j );
 				ret.addElement ( journal );
@@ -217,12 +215,12 @@ public class Repository {
 	 * Update the listOfDates array. Update the Vector of existing categories.
 	 */
 	private void rebuildPrivateData () {
-		Vector dates = new Vector ();
-		this.categories = new Vector ();
-		HashMap catH = new HashMap ();
-		HashMap h = new HashMap ();
+		Vector<Date> dates = new Vector<Date> ();
+		this.categories = new Vector<String> ();
+		HashMap<String, String> catH = new HashMap<String, String> ();
+		HashMap<String, String> h = new HashMap<String, String> ();
 		for ( int i = 0; i < dataFiles.size (); i++ ) {
-			DataFile df = (DataFile) dataFiles.elementAt ( i );
+			DataFile df = dataFiles.elementAt ( i );
 			// System.out.println ( "DataFile#" + i + ": " + df.toString () );
 			// System.out.println ( " df.getJournalCount () =" + df.getJournalCount ()
 			// );
@@ -256,7 +254,7 @@ public class Repository {
 			Collections.sort ( dates );
 			listOfDates = new Date[dates.size ()];
 			for ( int i = 0; i < dates.size (); i++ ) {
-				listOfDates[i] = (Date) dates.elementAt ( i );
+				listOfDates[i] = dates.elementAt ( i );
 				// System.out.println ( "Found date: " + listOfDates[i] );
 			}
 		} else {
@@ -306,8 +304,7 @@ public class Repository {
 		if ( added ) {
 			for ( int i = 0; this.changeListeners != null
 			    && i < this.changeListeners.size (); i++ ) {
-				RepositoryChangeListener l = (RepositoryChangeListener) this.changeListeners
-				    .elementAt ( i );
+				RepositoryChangeListener l = this.changeListeners.elementAt ( i );
 				l.journalAdded ( j );
 			}
 		} else {
@@ -315,8 +312,7 @@ public class Repository {
 			// already be updated in the DataStore.
 			for ( int i = 0; this.changeListeners != null
 			    && i < this.changeListeners.size (); i++ ) {
-				RepositoryChangeListener l = (RepositoryChangeListener) this.changeListeners
-				    .elementAt ( i );
+				RepositoryChangeListener l = this.changeListeners.elementAt ( i );
 				l.journalUpdated ( j );
 			}
 		}
@@ -342,8 +338,7 @@ public class Repository {
 				rebuildPrivateData ();
 				for ( int i = 0; this.changeListeners != null
 				    && i < this.changeListeners.size (); i++ ) {
-					RepositoryChangeListener l = (RepositoryChangeListener) this.changeListeners
-					    .elementAt ( i );
+					RepositoryChangeListener l = this.changeListeners.elementAt ( i );
 					l.journalDeleted ( j );
 				}
 			} else {
@@ -360,11 +355,11 @@ public class Repository {
 	 */
 	public void addChangeListener ( RepositoryChangeListener l ) {
 		if ( this.changeListeners == null )
-			this.changeListeners = new Vector ();
+			this.changeListeners = new Vector<RepositoryChangeListener> ();
 		this.changeListeners.addElement ( l );
 	}
 
-	public Vector getCategories () {
+	public Vector<String> getCategories () {
 		return this.categories;
 	}
 

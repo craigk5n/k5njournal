@@ -100,8 +100,8 @@ public class DateTimeSelectionDialog extends JDialog {
 		panel.setLayout ( vLayout );
 
 		JPanel datePanel = new JPanel ();
-		ProportionalLayout hLayout1 = new ProportionalLayout ( hProportions,
-		    ProportionalLayout.HORIZONTAL_LAYOUT );
+		//ProportionalLayout hLayout1 = new ProportionalLayout ( hProportions,
+		//    ProportionalLayout.HORIZONTAL_LAYOUT );
 		datePanel.add ( new JLabel ( "Date: " ) );
 		JPanel dateSelPanel = new JPanel ();
 		dateSelPanel.setLayout ( new FlowLayout () );
@@ -111,7 +111,7 @@ public class DateTimeSelectionDialog extends JDialog {
 		dayOfMonth.setText ( "" + date.getDay () );
 		dateSelPanel.add ( dayOfMonth );
 
-		Vector sortOptions = new Vector ();
+		Vector<String> sortOptions = new Vector<String> ();
 		sortOptions.add ( "Jan" );
 		sortOptions.add ( "Feb" );
 		sortOptions.add ( "Mar" );
