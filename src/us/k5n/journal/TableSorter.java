@@ -55,30 +55,33 @@ import javax.swing.table.TableModel;
  * getValueAt(row, col)) they are passed to the underlying model after the row
  * numbers have been translated via the internal mapping array. This way, the
  * TableSorter appears to hold another copy of the table with the rows in a
- * different order. <p/> TableSorter registers itself as a listener to the
- * underlying model, just as the JTable itself would. Events recieved from the
- * model are examined, sometimes manipulated (typically widened), and then
- * passed on to the TableSorter's listeners (typically the JTable). If a change
- * to the model has invalidated the order of TableSorter's rows, a note of this
- * is made and the sorter will resort the rows the next time a value is
- * requested. <p/> When the tableHeader property is set, either by using the
- * setTableHeader() method or the two argument constructor, the table header may
- * be used as a complete UI for TableSorter. The default renderer of the
- * tableHeader is decorated with a renderer that indicates the sorting status of
- * each column. In addition, a mouse listener is installed with the following
- * behavior:
+ * different order.
+ * <p/>
+ * TableSorter registers itself as a listener to the underlying model, just as
+ * the JTable itself would. Events recieved from the model are examined,
+ * sometimes manipulated (typically widened), and then passed on to the
+ * TableSorter's listeners (typically the JTable). If a change to the model has
+ * invalidated the order of TableSorter's rows, a note of this is made and the
+ * sorter will resort the rows the next time a value is requested.
+ * <p/>
+ * When the tableHeader property is set, either by using the setTableHeader()
+ * method or the two argument constructor, the table header may be used as a
+ * complete UI for TableSorter. The default renderer of the tableHeader is
+ * decorated with a renderer that indicates the sorting status of each column.
+ * In addition, a mouse listener is installed with the following behavior:
  * <ul>
- * <li> Mouse-click: Clears the sorting status of all other columns and advances
+ * <li>Mouse-click: Clears the sorting status of all other columns and advances
  * the sorting status of that column through three values: {NOT_SORTED,
  * ASCENDING, DESCENDING} (then back to NOT_SORTED again).
- * <li> SHIFT-mouse-click: Clears the sorting status of all other columns and
+ * <li>SHIFT-mouse-click: Clears the sorting status of all other columns and
  * cycles the sorting status of the column through the same three values, in the
  * opposite order: {NOT_SORTED, DESCENDING, ASCENDING}.
- * <li> CONTROL-mouse-click and CONTROL-SHIFT-mouse-click: as above except that
+ * <li>CONTROL-mouse-click and CONTROL-SHIFT-mouse-click: as above except that
  * the changes to the column do not cancel the statuses of columns that are
  * already sorting - giving a way to initiate a compound sort.
  * </ul>
- * <p/> This is a long overdue rewrite of a class of the same name that first
+ * <p/>
+ * This is a long overdue rewrite of a class of the same name that first
  * appeared in the swing table demos in 1997.
  * 
  * @author Philip Milne
@@ -97,12 +100,12 @@ public class TableSorter extends AbstractTableModel {
 
 	private static Directive EMPTY_DIRECTIVE = new Directive ( -1, NOT_SORTED );
 
-	public static final Comparator COMPARABLE_COMAPRATOR = new Comparator () {
+	public static final Comparator<Object> COMPARABLE_COMAPRATOR = new Comparator () {
 		public int compare ( Object o1, Object o2 ) {
-			return ( (Comparable) o1 ).compareTo ( o2 );
+			return ( (Comparable<Object>) o1 ).compareTo ( o2 );
 		}
 	};
-	public static final Comparator LEXICAL_COMPARATOR = new Comparator () {
+	public static final Comparator<Object> LEXICAL_COMPARATOR = new Comparator () {
 		public int compare ( Object o1, Object o2 ) {
 			return o1.toString ().compareTo ( o2.toString () );
 		}
@@ -114,8 +117,8 @@ public class TableSorter extends AbstractTableModel {
 	private JTableHeader tableHeader;
 	private MouseListener mouseListener;
 	private TableModelListener tableModelListener;
-	private Map columnComparators = new HashMap ();
-	private List sortingColumns = new ArrayList ();
+	private Map<Class, Comparator> columnComparators = new HashMap<Class, Comparator> ();
+	private List<Directive> sortingColumns = new ArrayList<Directive> ();
 
 	public TableSorter() {
 		this.mouseListener = new MouseHandler ();
@@ -184,7 +187,7 @@ public class TableSorter extends AbstractTableModel {
 
 	private Directive getDirective ( int column ) {
 		for ( int i = 0; i < sortingColumns.size (); i++ ) {
-			Directive directive = (Directive) sortingColumns.get ( i );
+			Directive directive = sortingColumns.get ( i );
 			if ( directive.column == column ) {
 				return directive;
 			}
@@ -229,7 +232,7 @@ public class TableSorter extends AbstractTableModel {
 		sortingStatusChanged ();
 	}
 
-	public void setColumnComparator ( Class type, Comparator comparator ) {
+	public void setColumnComparator ( Class type, Comparator<Object> comparator ) {
 		if ( comparator == null ) {
 			columnComparators.remove ( type );
 		} else {
@@ -237,9 +240,9 @@ public class TableSorter extends AbstractTableModel {
 		}
 	}
 
-	protected Comparator getComparator ( int column ) {
+	protected Comparator<Object> getComparator ( int column ) {
 		Class columnType = tableModel.getColumnClass ( column );
-		Comparator comparator = (Comparator) columnComparators.get ( columnType );
+		Comparator<Object> comparator = columnComparators.get ( columnType );
 		if ( comparator != null ) {
 			return comparator;
 		}
@@ -322,8 +325,8 @@ public class TableSorter extends AbstractTableModel {
 			int row1 = modelIndex;
 			int row2 = ( (Row) o ).modelIndex;
 
-			for ( Iterator it = sortingColumns.iterator (); it.hasNext (); ) {
-				Directive directive = (Directive) it.next ();
+			for ( Iterator<Directive> it = sortingColumns.iterator (); it.hasNext (); ) {
+				Directive directive = it.next ();
 				int column = directive.column;
 				Object o1 = tableModel.getValueAt ( row1, column );
 				Object o2 = tableModel.getValueAt ( row2, column );

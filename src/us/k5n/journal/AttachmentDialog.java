@@ -43,15 +43,14 @@ import us.k5n.ical.ParseException;
 /**
  * Present a dialog window that allows the user to add and remove attachments.
  * The simplest way to use this class is with the static
- * <tt>showAttachmentDialog</tt> method. TODO: use a table to display file
- * size.
+ * <tt>showAttachmentDialog</tt> method. TODO: use a table to display file size.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: AttachmentDialog.java,v 1.2 2007-09-21 20:48:24 cknudsen Exp $
+ * @version $Id: AttachmentDialog.java,v 1.3 2011-03-31 02:09:13 cknudsen Exp $
  */
 public class AttachmentDialog extends JDialog {
 	JList list;
-	Vector attachments;
+	Vector<Attachment> attachments;
 	boolean userAccepted = false;
 	JFrame parent;
 	private static File lastDirectory = null;
@@ -66,19 +65,20 @@ public class AttachmentDialog extends JDialog {
 	 * @return A Vector of attachments. This can be size 0. If the user pressed
 	 *         "Cancel", then null will be returned.
 	 */
-	public static Vector showAttachmentDialog ( JFrame parent, Vector attachments ) {
+	public static Vector<Attachment> showAttachmentDialog ( JFrame parent,
+	    Vector<Attachment> attachments ) {
 		AttachmentDialog ad = new AttachmentDialog ( parent, attachments );
-		Vector ret = ad.userAccepted ? ad.attachments : null;
+		Vector<Attachment> ret = ad.userAccepted ? ad.attachments : null;
 		return ret;
 	}
 
-	public AttachmentDialog(JFrame parent, Vector attachments) {
+	public AttachmentDialog(JFrame parent, Vector<Attachment> attachments) {
 		super ( (JFrame) null );
 		this.parent = parent;
 		setDefaultCloseOperation ( JDialog.DISPOSE_ON_CLOSE );
 		this.setModal ( true );
-		this.attachments = attachments == null ? new Vector ()
-		    : (Vector) attachments.clone ();
+		this.attachments = (Vector<Attachment>) ( attachments == null ? new Vector<Attachment> ()
+		    : attachments.clone () );
 		this.getContentPane ().setLayout ( new BorderLayout () );
 		JPanel buttonPanel = new JPanel ();
 		buttonPanel.setLayout ( new FlowLayout () );
@@ -146,9 +146,9 @@ public class AttachmentDialog extends JDialog {
 	}
 
 	private void rebuildList () {
-		Vector items = new Vector ();
+		Vector<String> items = new Vector<String> ();
 		for ( int i = 0; this.attachments != null && i < this.attachments.size (); i++ ) {
-			Attachment a = (Attachment) this.attachments.elementAt ( i );
+			Attachment a = this.attachments.elementAt ( i );
 			String filename = a.getFilename ();
 			items.addElement ( filename == null ? "Unnamed-" + ( i + 1 ) : filename );
 		}
