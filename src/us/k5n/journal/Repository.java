@@ -37,7 +37,7 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.3 2011-03-31 02:01:36 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.4 2011-03-31 02:32:12 cknudsen Exp $
  */
 public class Repository {
 	File directory;
@@ -56,10 +56,22 @@ public class Repository {
 		this.changeListeners = new Vector<RepositoryChangeListener> ();
 		this.categories = new Vector<String> ();
 
-		// Load all files.
-		File[] files = this.directory.listFiles ( new IcsFileFilter () );
+		// Load all encrypted files first.
+		//TODO: implement!!!
+		/*
+		File[] files = this.directory.listFiles ( new EncFileFilter () );
 		for ( int i = 0; files != null && i < files.length; i++ ) {
-			DataFile f = new DataFile ( files[i].getAbsolutePath (), strictParsing );
+			DataFile f = new DataFile ( files[i].getAbsolutePath (), strictParsing, true );
+			if ( f != null ) {
+				this.addDataFile ( f );
+			}
+		}
+		*/
+
+		// Load all files.
+		File []files = this.directory.listFiles ( new IcsFileFilter () );
+		for ( int i = 0; files != null && i < files.length; i++ ) {
+			DataFile f = new DataFile ( files[i].getAbsolutePath (), strictParsing, false );
 			if ( f != null ) {
 				this.addDataFile ( f );
 			}
@@ -118,7 +130,7 @@ public class Repository {
 	public int[] getMonthsForYear ( int year ) {
 		if ( listOfDates == null )
 			return null;
-		HashMap<Integer,Integer> h = new HashMap<Integer,Integer> ();
+		HashMap<Integer, Integer> h = new HashMap<Integer, Integer> ();
 		Vector<Integer> months = new Vector<Integer> ();
 		for ( int i = 0; i < listOfDates.length; i++ ) {
 			if ( listOfDates[i].getYear () == year ) {

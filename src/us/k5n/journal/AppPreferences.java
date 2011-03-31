@@ -25,7 +25,7 @@ package us.k5n.journal;
  * class abstracts out the details of where the info saved (Windows registry,
  * etc.)
  * 
- * @version $Id: AppPreferences.java,v 1.7 2007-10-04 03:33:15 cknudsen Exp $
+ * @version $Id: AppPreferences.java,v 1.8 2011-03-31 02:32:12 cknudsen Exp $
  * @author Craig Knudsen, craig@k5n.us
  */
 public class AppPreferences {
@@ -41,6 +41,10 @@ public class AppPreferences {
 	static final String EDIT_WINDOW_HEIGHT = "EditWindow.height";
 	static final String EDIT_WINDOW_X = "EditWindow.x";
 	static final String EDIT_WINDOW_Y = "EditWindow.y";
+
+	static final String ENCRYPTION_KEY = "Encryption.key";
+	// TODO: support JDK6 strong encryption using the
+	// "Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files"
 
 	private static AppPreferences instance = null;
 
@@ -253,6 +257,20 @@ public class AppPreferences {
 	 */
 	public void setEditWindowY ( int editWindowY ) {
 		prefs.putInt ( EDIT_WINDOW_Y, editWindowY );
+	}
+
+	/**
+	 * Get encryption key.
+	 */
+	public String getEncryptionKey () {
+		return prefs.get ( ENCRYPTION_KEY, null );
+	}
+
+	/**
+	 * Set encryption key.
+	 */
+	public void setEncryptionKey ( String key ) {
+		prefs.put ( ENCRYPTION_KEY, key );
 	}
 
 }

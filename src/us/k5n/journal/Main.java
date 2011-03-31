@@ -86,7 +86,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.17 2009-04-06 15:07:04 cknudsen Exp $
+ * @version $Id: Main.java,v 1.18 2011-03-31 02:32:12 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -103,10 +103,10 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	JournalViewPanel journalView = null;
 	// filteredJournalEntries is the Vector of Journal objects filtered
 	// by dates selected by the user. (Not yet filtered by search text.)
-	Vector filteredJournalEntries;
+	Vector<Journal> filteredJournalEntries;
 	// filteredSearchedJournalEntries is filtered by both date selection
 	// and text search.
-	Vector filteredSearchedJournalEntries;
+	Vector<Journal> filteredSearchedJournalEntries;
 	final static String[] journalListTableHeader = { "Date", "Subject" };
 	final static String[] monthNames = { "", "January", "February", "March",
 	    "April", "May", "June", "July", "August", "September", "October",
@@ -116,6 +116,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	JTextField searchTextField;
 	JSplitPane verticalSplit = null, horizontalSplit = null;
 	String searchText = null;
+	private static String passphrase = "How Now Brown Cow";
 	private static File lastExportDirectory = null;
 	AppPreferences prefs;
 	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
@@ -236,7 +237,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 				int ind = journalListTable.getSelectedRow ();
 				if ( ind >= 0 && filteredSearchedJournalEntries != null
 				    && ind < filteredSearchedJournalEntries.size () ) {
-					Journal j = (Journal) filteredSearchedJournalEntries.elementAt ( ind );
+					Journal j = filteredSearchedJournalEntries.elementAt ( ind );
 					if ( JOptionPane.showConfirmDialog ( parent,
 					    "Are you sure you want\nto delete this entry?", "Confirm Delete",
 					    JOptionPane.YES_NO_OPTION ) == 0 ) {
@@ -507,14 +508,15 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		int[] years = dataRepository.getYears ();
 		if ( years != null ) {
 			for ( int i = years.length - 1; i >= 0; i-- ) {
-				Vector yearEntries = dataRepository.getEntriesByYear ( years[i] );
+				Vector<Journal> yearEntries = dataRepository
+				    .getEntriesByYear ( years[i] );
 				DateFilterTreeNode yearNode = new DateFilterTreeNode ( "" + years[i],
 				    years[i], 0, 0, yearEntries == null ? 0 : yearEntries.size () );
 				dateTreeAllNode.add ( yearNode );
 				int[] months = dataRepository.getMonthsForYear ( years[i] );
 				for ( int j = 0; months != null && j < months.length; j++ ) {
-					Vector monthEntries = dataRepository.getEntriesByMonth ( years[i],
-					    months[j] );
+					Vector<Journal> monthEntries = dataRepository.getEntriesByMonth (
+					    years[i], months[j] );
 					DateFilterTreeNode monthNode = new DateFilterTreeNode (
 					    monthNames[months[j]], years[i], months[j], 0,
 					    monthEntries == null ? 0 : monthEntries.size () );
@@ -543,8 +545,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 	// Filter the specified Vector of Journal objects by
 	// the searchText using a regular expression.
-	private Vector filterSearchText ( Vector entries ) {
-		Vector ret;
+	private Vector<Journal> filterSearchText ( Vector<Journal> entries ) {
+		Vector<Journal> ret;
 		Pattern pat;
 		Matcher m;
 
@@ -563,11 +565,11 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		if ( sb.length () == 0 )
 			return entries;
 
-		ret = new Vector ();
+		ret = new Vector<Journal> ();
 		pat = Pattern.compile ( sb.toString (), Pattern.CASE_INSENSITIVE );
 		// System.out.println ( "Pattern: " + pat );
 		for ( int i = 0; i < entries.size (); i++ ) {
-			Journal j = (Journal) entries.elementAt ( i );
+			Journal j = entries.elementAt ( i );
 			Description d = j.getDescription ();
 			boolean matches = false;
 			// Search summary, categories, and description
@@ -617,7 +619,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		journalListTable.clearHighlightedRows ();
 		for ( int i = 0; filteredSearchedJournalEntries != null
 		    && i < filteredSearchedJournalEntries.size (); i++ ) {
-			Journal entry = (Journal) filteredSearchedJournalEntries.elementAt ( i );
+			Journal entry = filteredSearchedJournalEntries.elementAt ( i );
 			if ( entry.getStartDate () != null ) {
 				journalListTable.setValueAt ( new DisplayDate ( entry.getStartDate (),
 				    entry ), i, 0 );
@@ -786,7 +788,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	}
 
 	protected void exportSelected () {
-		Vector selected = new Vector ();
+		Vector<Journal> selected = new Vector<Journal> ();
 		int[] sel = journalListTable.getSelectedRows ();
 		if ( sel == null || sel.length == 0 ) {
 			showError ( "You have not selected any entries" );
@@ -800,7 +802,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		export ( "Export Selected", selected );
 	}
 
-	private void export ( String title, Vector journalEntries ) {
+	private void export ( String title, Vector<Journal> journalEntries ) {
 		JFileChooser fileChooser;
 		File outFile = null;
 
@@ -851,7 +853,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			ICalendarParser p = new ICalendarParser ( PARSE_LOOSE );
 			DataStore dataStore = p.getDataStoreAt ( 0 );
 			for ( int i = 0; i < journalEntries.size (); i++ ) {
-				Journal j = (Journal) journalEntries.elementAt ( i );
+				Journal j = journalEntries.elementAt ( i );
 				dataStore.storeJournal ( j );
 			}
 			writer.write ( p.toICalendar () );
@@ -917,6 +919,10 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		handleDateFilterSelection ( 0, null );
 	}
 
+	protected static String getPassphrase () {
+		return passphrase;
+	}
+
 	/**
 	 * @param args
 	 */
@@ -957,17 +963,17 @@ class SortableJournal implements Comparable {
 		return j.journal.getDtstamp ().compareTo ( this.journal.getDtstamp () );
 	}
 
-	public static Vector sortJournals ( Vector journals ) {
-		Vector sjs = new Vector ();
+	public static Vector<Journal> sortJournals ( Vector<Journal> journals ) {
+		Vector<SortableJournal> sjs = new Vector<SortableJournal> ();
 		for ( int i = 0; i < journals.size (); i++ ) {
-			Journal j = (Journal) journals.elementAt ( i );
+			Journal j = journals.elementAt ( i );
 			SortableJournal sj = new SortableJournal ( j );
 			sjs.addElement ( sj );
 		}
 		Collections.sort ( sjs );
-		Vector ret = new Vector ();
+		Vector<Journal> ret = new Vector<Journal> ();
 		for ( int i = 0; i < sjs.size (); i++ ) {
-			SortableJournal sj = (SortableJournal) sjs.elementAt ( i );
+			SortableJournal sj = sjs.elementAt ( i );
 			ret.addElement ( sj.journal );
 		}
 		return ret;

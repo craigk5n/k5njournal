@@ -24,6 +24,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.jasypt.util.text.BasicTextEncryptor;
+
 import us.k5n.ical.Constants;
 import us.k5n.ical.DataStore;
 import us.k5n.ical.ICalendarParser;
@@ -38,14 +40,14 @@ import us.k5n.ical.ParseError;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.3 2011-03-31 02:32:12 cknudsen Exp $
  */
 public class DataFile extends File implements Constants {
 	ICalendarParser parser;
 	DataStore dataStore;
 
 	public DataFile(String filename) {
-		this ( filename, false );
+		this ( filename, false, false );
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class DataFile extends File implements Constants {
 	 *          The filename (YYYYMMDD.ics as in "19991231.ics")
 	 * @param strictParsing
 	 */
-	public DataFile(String filename, boolean strictParsing) {
+	public DataFile(String filename, boolean strictParsing, boolean encrypted) {
 		super ( filename );
 		parser = new ICalendarParser ( strictParsing ? PARSE_STRICT : PARSE_LOOSE );
 		if ( this.exists () ) {
@@ -156,6 +158,16 @@ public class DataFile extends File implements Constants {
 		FileWriter writer = null;
 		writer = new FileWriter ( this );
 		writer.write ( parser.toICalendar () );
+		writer.close ();
+
+		// Now write encrypted file
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
+		String passphrase = Main.getPassphrase ();
+		textEncryptor.setPassword ( passphrase );
+
+		File encFile = new File ( this + ".enc" );
+		writer = new FileWriter ( encFile );
+		writer.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
 		writer.close ();
 	}
 }

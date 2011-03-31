@@ -52,3 +52,11 @@ This tool makes use of and include Joda Time:
 Joda Time is licensed under the Apache License:
 
 	http://joda-time.sourceforge.net/license.html
+
+To encrypt the data files, jasypt is used:
+
+	http://www.jasypt.org/
+
+Jasypt is licensed under the Apache Software License, Version 2:
+
+	http://www.jasypt.org/license.html
