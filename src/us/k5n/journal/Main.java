@@ -89,7 +89,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.20 2011-04-02 17:43:39 cknudsen Exp $
+ * @version $Id: Main.java,v 1.21 2011-04-02 20:54:21 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -209,7 +209,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 	JToolBar createToolBar () {
 		JToolBar toolbar = new JToolBar ();
-		newButton = makeNavigationButton ( "New24.gif", "new",
+		newButton = makeNavigationButton ( "new.png", "new",
 		    "Add new Journal entry", "New..." );
 		newButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
@@ -218,7 +218,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		} );
 		toolbar.add ( newButton );
 
-		editButton = makeNavigationButton ( "Edit24.gif", "edit",
+		editButton = makeNavigationButton ( "edit.png", "edit",
 		    "Edit Journal entry", "Edit..." );
 		toolbar.add ( editButton );
 		editButton.addActionListener ( new ActionListener () {
@@ -234,7 +234,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			}
 		} );
 
-		deleteButton = makeNavigationButton ( "Delete24.gif", "delete",
+		deleteButton = makeNavigationButton ( "delete.png", "delete",
 		    "Delete Journal entry", "Delete" );
 		toolbar.add ( deleteButton );
 		deleteButton.addActionListener ( new ActionListener () {
@@ -404,7 +404,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		searchPanel.setBorder ( BorderFactory.createEmptyBorder ( 4, 4, 4, 4 ) );
 		searchPanel.setLayout ( new BorderLayout () );
 		URL imageURL = this.getClass ().getClassLoader ().getResource (
-		    "images/Search24.gif" );
+		    "images/search.png" );
 		ImageIcon icon = imageURL == null ? null : new ImageIcon ( imageURL );
 		JLabel searchLabel = new JLabel ();
 		searchLabel.setIcon ( icon );
