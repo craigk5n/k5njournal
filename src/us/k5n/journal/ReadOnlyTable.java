@@ -24,8 +24,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -36,13 +39,14 @@ import javax.swing.table.TableModel;
  * Overide methods of JTable to customize: no cell editing, alternating
  * background colors for odd/even rows, resize to fit
  * 
- * @version $Id: ReadOnlyTable.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: ReadOnlyTable.java,v 1.3 2011-04-02 17:34:39 cknudsen Exp $
  * @author Craig Knudsen, craig@k5n.us
  */
 public class ReadOnlyTable extends JTable {
 	int[] highlightedRows = null;
 	Color lightGray;
 	private boolean firstPaint = true;
+	private HashMap<Integer, Integer> fixedWidths = new HashMap<Integer, Integer> ();
 
 	public void clearHighlightedRows () {
 		this.highlightedRows = null;
@@ -67,6 +71,10 @@ public class ReadOnlyTable extends JTable {
 				return true;
 		}
 		return false;
+	}
+
+	public void setColumnFixedWidth ( int col, int width ) {
+		this.fixedWidths.put ( new Integer ( col ), new Integer ( width ) );
 	}
 
 	public Component prepareRenderer ( TableCellRenderer renderer, int rowIndex,
@@ -106,7 +114,7 @@ public class ReadOnlyTable extends JTable {
 		if ( firstPaint ) {
 			// After first paint call, we can get font metric info. So,
 			// call autoResize to adjust column widths.
-			// autoResize ();
+			autoResize ();
 			// doLayout ();
 			firstPaint = false;
 		}
@@ -114,19 +122,43 @@ public class ReadOnlyTable extends JTable {
 	}
 
 	private void autoResize () {
+		final int viewWidth = this.getVisibleRect ().width;
+		int numVariableW = 0;
 		FontMetrics fm = getGraphics ().getFontMetrics ();
 		int[] widths = new int[getColumnCount ()];
 		for ( int i = 0; i < getColumnCount (); i++ ) {
-			TableColumn tc = this.getColumnModel ().getColumn ( i );
-			String label = (String) tc.getHeaderValue ();
-			widths[i] = fm.stringWidth ( label ) + 2
-			    * getColumnModel ().getColumnMargin () + 15;
+			Integer colInt = new Integer ( i );
+			if ( this.fixedWidths.containsKey ( colInt ) ) {
+				widths[i] = fixedWidths.get ( colInt ).intValue ();
+			} else {
+				numVariableW++;
+				TableColumn tc = this.getColumnModel ().getColumn ( i );
+				Object o = tc.getHeaderValue ();
+				if ( o instanceof String ) {
+					String label = (String) tc.getHeaderValue ();
+					widths[i] = fm.stringWidth ( label ) + 2
+					    * getColumnModel ().getColumnMargin () + 15;
+				} else if ( o instanceof ImageIcon ) {
+					ImageIcon icon = (ImageIcon) o;
+					widths[i] = icon.getIconWidth () + 5;
+				} else {
+					// Assume some default size
+					widths[i] = 20;
+				}
+			}
 		}
 		for ( int row = 0; row < getRowCount (); row++ ) {
 			for ( int col = 0; col < getColumnCount (); col++ ) {
-				String val = this.getValueAt ( row, col ).toString ();
-				int width = ( val == null ? 0 : fm.stringWidth ( val )
-				    + ( 2 * getColumnModel ().getColumnMargin () ) + 6 );
+				Object o = this.getValueAt ( row, col );
+				int width = 0;
+				if ( o instanceof String ) {
+					String val = this.getValueAt ( row, col ).toString ();
+					width = ( val == null ? 0 : fm.stringWidth ( val )
+					    + ( 2 * getColumnModel ().getColumnMargin () ) + 6 );
+				} else if ( o instanceof ImageIcon ) {
+					ImageIcon icon = (ImageIcon) o;
+					width = icon.getIconWidth () + 5;
+				}
 				if ( width > widths[col] )
 					widths[col] = width;
 			}
@@ -136,12 +168,22 @@ public class ReadOnlyTable extends JTable {
 		for ( int i = 0; i < getColumnCount (); i++ ) {
 			totalW += widths[i];
 		}
-		Dimension d = getPreferredSize ();
-		d = new Dimension ( totalW + 50, d.height );
+		// Dimension d = getPreferredSize ();
+		// d = new Dimension ( totalW + 50, d.height );
 		// setPreferredSize ( d );
+		// How much extra space do we have?
+		int extraW = viewWidth - totalW;
+		if ( extraW < 0 )
+			extraW = 0;
+		int padding = numVariableW == 0 ? 0 : extraW / numVariableW;
 		for ( int i = 0; i < getColumnCount (); i++ ) {
+			int newWidth = widths[i];
 			TableColumn tc = getColumnModel ().getColumn ( i );
-			tc.setPreferredWidth ( widths[i] );
+			if ( !this.fixedWidths.containsKey ( new Integer ( i ) ) )
+				newWidth += padding;
+			tc.setPreferredWidth ( newWidth );
+			tc.setWidth ( newWidth );
+			//System.out.println ( "Setting col#" + i + " width=" + widths[i] );
 		}
 	}
 
@@ -151,8 +193,12 @@ public class ReadOnlyTable extends JTable {
 			public String getToolTipText ( MouseEvent e ) {
 				java.awt.Point p = e.getPoint ();
 				int index = columnModel.getColumnIndexAtX ( p.x );
-				String text = columnModel.getColumn ( index ).getHeaderValue ()
-				    .toString ();
+				Object o = columnModel.getColumn ( index ).getHeaderValue ();
+				String text = null;
+				if ( o instanceof String )
+					text = (String) o;
+				else
+					text = "this column";
 				return "Click to sort by " + text;
 			}
 		};

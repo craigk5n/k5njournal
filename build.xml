@@ -1,5 +1,5 @@
 <!-- ant build.xml file for k5n ical lib -->
-<!-- $Id: build.xml,v 1.7 2011-03-31 02:32:12 cknudsen Exp $ -->
+<!-- $Id: build.xml,v 1.8 2011-04-02 17:34:38 cknudsen Exp $ -->
 
 <project name="k5njournal" default="dist" basedir=".">
   <description>Top-level build file for k5nJournal</description>
@@ -16,7 +16,7 @@
   <property name="version" value="0.3.1"/>
 
   <property name="k5n-ical-lib" value="lib/k5n-ical-0.4.3.jar"/>
-  <property name="jasyptl-lib" value="lib/k5n-ical-0.4.3.jar"/>
+  <property name="jasypt-lib" value="lib/jasypt-1.7.jar"/>
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -36,8 +36,10 @@
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}">
-       <pathelement path="${k5n-ical-lib}" />
-       <pathelement path="${jasypt-lib}" />
+       <classpath>
+         <pathelement path="${k5n-ical-lib}" />
+         <pathelement path="${jasypt-lib}" />
+       </classpath>
     </javac>
   </target>
 

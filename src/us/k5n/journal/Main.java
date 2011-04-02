@@ -59,6 +59,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
@@ -67,6 +68,8 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -86,7 +89,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.18 2011-03-31 02:32:12 cknudsen Exp $
+ * @version $Id: Main.java,v 1.19 2011-04-02 17:34:39 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -100,6 +103,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	DefaultMutableTreeNode dateTreeAllNode;
 	ReadOnlyTable journalListTable;
 	ReadOnlyTabelModel journalListTableModel;
+	ImageIcon clipIcon = null;
 	JournalViewPanel journalView = null;
 	// filteredJournalEntries is the Vector of Journal objects filtered
 	// by dates selected by the user. (Not yet filtered by search text.)
@@ -107,7 +111,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	// filteredSearchedJournalEntries is filtered by both date selection
 	// and text search.
 	Vector<Journal> filteredSearchedJournalEntries;
-	final static String[] journalListTableHeader = { "Date", "Subject" };
+	final static String[] journalListTableHeader = { "", "Date", "Subject" };
 	final static String[] monthNames = { "", "January", "February", "March",
 	    "April", "May", "June", "July", "August", "September", "October",
 	    "November", "December" };
@@ -221,7 +225,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 				int ind = journalListTable.getSelectedRow ();
 				if ( ind >= 0 && filteredSearchedJournalEntries != null
 				    && ind < filteredSearchedJournalEntries.size () ) {
-					DisplayDate dd = (DisplayDate) journalListTable.getValueAt ( ind, 0 );
+					DisplayDate dd = (DisplayDate) journalListTable.getValueAt ( ind, 1 );
 					Journal j = (Journal) dd.getUserData ();
 					new EditWindow ( parent, dataRepository, j );
 				}
@@ -413,12 +417,45 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		journalListPane.add ( searchPanel, BorderLayout.NORTH );
 
 		journalListTableModel = new ReadOnlyTabelModel ( journalListTableHeader, 0,
-		    2 );
+		    3 );
+
 		TableSorter sorter = new TableSorter ( journalListTableModel );
 		journalListTable = new ReadOnlyTable ( sorter );
 		sorter.setTableHeader ( journalListTable.getTableHeader () );
 		// journalListTable.setAutoResizeMode ( JTable.AUTO_RESIZE_OFF );
 		journalListTable.setRowSelectionAllowed ( true );
+		TableColumn tc = journalListTable.getColumnModel ().getColumn ( 0 );
+		tc.setWidth ( 15 );
+		journalListTable.setColumnFixedWidth ( 0, 20 );
+
+		imageURL = this.getClass ().getClassLoader ().getResource (
+		    "images/clip.png" );
+		clipIcon = new ImageIcon ( imageURL );
+
+		// Set the text and icon values on the second column for the icon render
+		// journalListTable.getColumnModel ().getColumn ( 0 ).setHeaderValue (
+		// "Attachments" );
+		journalListTable.getColumnModel ().getColumn ( 0 ).setHeaderValue ( " " );
+		journalListTable.getColumnModel ().getColumn ( 0 ).setCellRenderer (
+		    new DefaultTableCellRenderer () {
+			    public Component getTableCellRendererComponent ( JTable tblDataTable,
+			        Object value, boolean isSelected, boolean hasFocus,
+			        int markedRow, int col ) {
+				    JLabel ret = (JLabel) super.getTableCellRendererComponent (
+				        tblDataTable, value, isSelected, hasFocus, markedRow, col );
+				    if ( value instanceof Integer
+				        && ( (Integer) value ).intValue () > 0 ) {
+					    ret.setIcon ( clipIcon );
+					    // ret.setText ( null );
+					    ret.setHorizontalTextPosition ( JLabel.LEFT );
+				    } else {
+				    	ret.setIcon ( null );
+				    }
+				    ret.setText ( null );
+				    ret.setHorizontalAlignment ( javax.swing.SwingConstants.RIGHT );
+				    return ret;
+			    }
+		    } );
 
 		// Add selection listener to table
 		journalListTable.getSelectionModel ().addListSelectionListener (
@@ -441,7 +478,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 						    journalListTable.setHighlightedRows ( selRows );
 						    if ( selRows != null && selRows.length == 1 ) {
 							    DisplayDate dd = (DisplayDate) journalListTable.getValueAt (
-							        ind, 0 );
+							        ind, 1 );
 							    Journal journal = (Journal) dd.getUserData ();
 							    if ( journal != null )
 								    journalView.setJournal ( journal );
@@ -620,15 +657,22 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		for ( int i = 0; filteredSearchedJournalEntries != null
 		    && i < filteredSearchedJournalEntries.size (); i++ ) {
 			Journal entry = filteredSearchedJournalEntries.elementAt ( i );
+			// Set attachment count
+			if ( entry.getAttachments () != null
+			    && entry.getAttachments ().size () > 0 )
+				journalListTable.setValueAt ( new Integer ( entry.getAttachments ()
+				    .size () ), i, 0 );
+			else
+				journalListTable.setValueAt ( new Integer ( 0 ), i, 0 );
 			if ( entry.getStartDate () != null ) {
 				journalListTable.setValueAt ( new DisplayDate ( entry.getStartDate (),
-				    entry ), i, 0 );
+				    entry ), i, 1 );
 			} else {
-				journalListTable.setValueAt ( new DisplayDate ( null, entry ), i, 0 );
+				journalListTable.setValueAt ( new DisplayDate ( null, entry ), i, 1 );
 			}
 			Summary summary = entry.getSummary ();
 			journalListTable.setValueAt (
-			    summary == null ? "-" : summary.getValue (), i, 1 );
+			    summary == null ? "-" : summary.getValue (), i, 2 );
 		}
 		this.showStatusMessage ( ""
 		    + ( filteredSearchedJournalEntries == null ? "No" : ""
