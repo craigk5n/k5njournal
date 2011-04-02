@@ -1,7 +1,7 @@
                            k5nJournal
 ****************************************************************************
 
-Version:      0.3.1
+Version:      0.3.2
 URL:          http://k5njournal.sourceforge.net
 Author:       Craig Knudsen, craig [< at >] k5n.us
 License:      GNU GPL
@@ -46,17 +46,19 @@ For information about this license:
 	http://www.gnu.org/licenses/gpl.html
 	
 This tool makes use of and include Joda Time:
-
-	http://www.joda.org/
-	
+  http://www.joda.org/
 Joda Time is licensed under the Apache License:
-
-	http://joda-time.sourceforge.net/license.html
+  http://joda-time.sourceforge.net/license.html
 
 To encrypt the data files, jasypt is used:
-
-	http://www.jasypt.org/
-
+  http://www.jasypt.org/
 Jasypt is licensed under the Apache Software License, Version 2:
+  http://www.jasypt.org/license.html
 
-	http://www.jasypt.org/license.html
+Icons are from the Oxygen icon set:
+  http://www.oxygen-icons.org/
+  Icons were downloaded from iconfinder.com:
+    http://www.iconfinder.com/search/?q=iconset%3Aoxygen
+  The Oxygen icon set is GPL:
+    http://www.gnu.org/copyleft/gpl.html
+

@@ -89,14 +89,14 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.21 2011-04-02 20:54:21 cknudsen Exp $
+ * @version $Id: Main.java,v 1.22 2011-04-02 20:58:16 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
     PropertyChangeListener, RepositoryChangeListener {
-  private static final long serialVersionUID = -4342269831089355103L;
+	private static final long serialVersionUID = 1L;
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
-	public static final String VERSION = "0.3.0 (02 May 2007)";
+	public static final String VERSION = "0.3.1 (02 Apr 2011)";
 	JFrame parent;
 	JLabel messageArea;
 	Repository dataRepository;
@@ -132,7 +132,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	static final String MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION = "MainWindow.hSplitPanePosition";
 
 	class DateFilterTreeNode extends DefaultMutableTreeNode {
-    private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 		public int year, month, day;
 		public String label;
 
@@ -440,8 +440,9 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		journalListTable.getColumnModel ().getColumn ( 0 ).setHeaderValue ( " " );
 		journalListTable.getColumnModel ().getColumn ( 0 ).setCellRenderer (
 		    new DefaultTableCellRenderer () {
-          private static final long serialVersionUID = 1L;
-					public Component getTableCellRendererComponent ( JTable tblDataTable,
+			    private static final long serialVersionUID = 1L;
+
+			    public Component getTableCellRendererComponent ( JTable tblDataTable,
 			        Object value, boolean isSelected, boolean hasFocus,
 			        int markedRow, int col ) {
 				    JLabel ret = (JLabel) super.getTableCellRendererComponent (
@@ -452,7 +453,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 					    // ret.setText ( null );
 					    ret.setHorizontalTextPosition ( JLabel.LEFT );
 				    } else {
-				    	ret.setIcon ( null );
+					    ret.setIcon ( null );
 				    }
 				    ret.setText ( null );
 				    ret.setHorizontalAlignment ( javax.swing.SwingConstants.RIGHT );

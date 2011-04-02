@@ -1,7 +1,7 @@
 k5nJournal ChangeLog
-Version: $Id: ChangeLog,v 1.9 2009-04-06 15:07:04 cknudsen Exp $
+Version: $Id: ChangeLog,v 1.10 2011-04-02 20:58:16 cknudsen Exp $
 
-Version 0.3.1 (?? ??? 2007)
+Version 0.3.1 (02 Apr 2011)
 - Bug fix: by default entries now show newest first in the list
 - Added support for attachments to journal entries.  Attachments
   are stored inline within the iCalendar data file.
