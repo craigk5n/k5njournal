@@ -46,9 +46,10 @@ import us.k5n.ical.ParseException;
  * <tt>showAttachmentDialog</tt> method. TODO: use a table to display file size.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: AttachmentDialog.java,v 1.3 2011-03-31 02:09:13 cknudsen Exp $
+ * @version $Id: AttachmentDialog.java,v 1.4 2011-04-02 21:13:28 cknudsen Exp $
  */
 public class AttachmentDialog extends JDialog {
+	private static final long serialVersionUID = 1L;
 	JList list;
 	Vector<Attachment> attachments;
 	boolean userAccepted = false;
@@ -77,8 +78,7 @@ public class AttachmentDialog extends JDialog {
 		this.parent = parent;
 		setDefaultCloseOperation ( JDialog.DISPOSE_ON_CLOSE );
 		this.setModal ( true );
-		this.attachments = (Vector<Attachment>) ( attachments == null ? new Vector<Attachment> ()
-		    : attachments.clone () );
+		this.attachments = cloneAttachments ( attachments );
 		this.getContentPane ().setLayout ( new BorderLayout () );
 		JPanel buttonPanel = new JPanel ();
 		buttonPanel.setLayout ( new FlowLayout () );
@@ -106,6 +106,12 @@ public class AttachmentDialog extends JDialog {
 
 		this.pack ();
 		this.setVisible ( true );
+	}
+
+	@SuppressWarnings("unchecked")
+	private Vector<Attachment> cloneAttachments ( Vector<Attachment> attachments ) {
+		return (Vector<Attachment>) ( attachments == null ? new Vector<Attachment> ()
+		    : attachments.clone () );
 	}
 
 	private JPanel createAttachmentSelection () {

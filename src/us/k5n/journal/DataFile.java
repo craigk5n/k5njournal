@@ -40,9 +40,10 @@ import us.k5n.ical.ParseError;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.3 2011-03-31 02:32:12 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.4 2011-04-02 21:13:28 cknudsen Exp $
  */
 public class DataFile extends File implements Constants {
+  private static final long serialVersionUID = 1L;
 	ICalendarParser parser;
 	DataStore dataStore;
 

@@ -41,6 +41,7 @@ import us.k5n.ical.BogusDataException;
 import us.k5n.ical.Date;
 
 public class DateTimeSelectionDialog extends JDialog {
+  private static final long serialVersionUID = 1L;
 	JTextField dayOfMonth, year;
 	JComboBox month;
 	JTextField hour, minute, second;

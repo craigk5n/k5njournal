@@ -28,10 +28,10 @@ import us.k5n.ical.Date;
  * display using SimpleDateFormat.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DisplayDate.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: DisplayDate.java,v 1.3 2011-04-02 21:13:28 cknudsen Exp $
  * 
  */
-public class DisplayDate implements Comparable {
+public class DisplayDate implements Comparable<DisplayDate> {
 	// Date formats are specified in the Java API doc.
 	// TODO: allow setting this format in user preferences
 	private static String dateOnlyFormat = "EEE, d MMM yyyy";
@@ -70,8 +70,7 @@ public class DisplayDate implements Comparable {
 		return this.userData;
 	}
 
-	public int compareTo ( Object arg0 ) {
-		DisplayDate d2 = (DisplayDate) arg0;
+	public int compareTo ( DisplayDate d2 ) {
 		return javaDate.compareTo ( d2.javaDate );
 	}
 

@@ -55,7 +55,7 @@ import us.k5n.ical.Summary;
 import us.k5n.ical.Utils;
 
 public class JournalViewPanel extends JPanel {
-	private Journal journal;
+  private static final long serialVersionUID = 1L;
 	private JTabbedPane tabbedPane;
 	private JLabel date;
 	private JLabel subject;
@@ -64,8 +64,6 @@ public class JournalViewPanel extends JPanel {
 
 	public JournalViewPanel() {
 		super ();
-
-		journal = null;
 
 		setLayout ( new BorderLayout () );
 
@@ -123,7 +121,6 @@ public class JournalViewPanel extends JPanel {
 	}
 
 	public void setJournal ( Journal j ) {
-		this.journal = j;
 		if ( j.getStartDate () != null ) {
 			DisplayDate d = new DisplayDate ( j.getStartDate () );
 			date.setText ( d.toString () );
@@ -150,7 +147,7 @@ public class JournalViewPanel extends JPanel {
 		for ( int i = tabbedPane.getTabCount (); i > 1; i-- ) {
 			tabbedPane.remove ( i - 1 );
 		}
-		Vector attachments = j.getAttachments ();
+		Vector<Attachment> attachments = j.getAttachments ();
 		for ( int i = 0; attachments != null && i < attachments.size (); i++ ) {
 			Attachment a = (Attachment) attachments.elementAt ( i );
 			tabbedPane.addTab ( a.getFilename (), null, createAttachmentTab ( a ),
@@ -198,6 +195,7 @@ public class JournalViewPanel extends JPanel {
 }
 
 class IV extends JPanel {
+  private static final long serialVersionUID = 1L;
 	BufferedImage image;
 	Rectangle r;
 	double scale, inc, min;

@@ -51,9 +51,10 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.6 2009-04-06 23:27:23 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.7 2011-04-02 21:13:28 cknudsen Exp $
  */
 public class EditWindow extends JDialog implements ComponentListener {
+	private static final long serialVersionUID = 1L;
 	Repository repo;
 	Journal journal;
 	Sequence seq = null;
@@ -61,7 +62,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 	JTextField subject;
 	JTextField categories;
 	JTextField attachmentsText;
-	Vector attachments;
+	Vector<Attachment> attachments;
 	JLabel startDate;
 	JTextArea description;
 	AppPreferences prefs;
@@ -98,12 +99,17 @@ public class EditWindow extends JDialog implements ComponentListener {
 		if ( this.journal.getCategories () == null )
 			this.journal.setCategories ( new Categories () );
 
-		if ( this.journal.getAttachments () != null )
-			this.attachments = this.journal.getAttachments ();
+		if ( getAttachments () != null )
+			this.attachments = getAttachments ();
 
 		createWindow ();
 		setVisible ( true );
 		this.addComponentListener ( this );
+	}
+
+	@SuppressWarnings("unchecked")
+	private Vector<Attachment> getAttachments () {
+		return this.journal.getAttachments ();
 	}
 
 	private void createWindow () {
@@ -242,10 +248,10 @@ public class EditWindow extends JDialog implements ComponentListener {
 		getContentPane ().add ( allButButtons, BorderLayout.CENTER );
 	}
 
-	String getAttachmentsLabel ( Vector list ) {
+	String getAttachmentsLabel ( Vector<Attachment> list ) {
 		StringBuffer sb = new StringBuffer ();
 		for ( int i = 0; list != null && i < list.size (); i++ ) {
-			Attachment a = (Attachment) list.elementAt ( i );
+			Attachment a = list.elementAt ( i );
 			String filename = a.getFilename ();
 			if ( i > 0 )
 				sb.append ( ", " );
@@ -274,8 +280,8 @@ public class EditWindow extends JDialog implements ComponentListener {
 	}
 
 	void chooseAttachments () {
-		Vector newAttachments = AttachmentDialog.showAttachmentDialog ( parent,
-		    this.attachments );
+		Vector<Attachment> newAttachments = AttachmentDialog.showAttachmentDialog (
+		    parent, this.attachments );
 		if ( newAttachments != null ) {
 			this.attachments = newAttachments;
 			// update display to show new attachments
