@@ -26,9 +26,11 @@ import javax.swing.table.AbstractTableModel;
  * header.
  * 
  * @author Craig Knudsen, craig@kn.us.
- * @version $Id: ReadOnlyTabelModel.java,v 1.2 2007-05-02 20:16:14 cknudsen Exp $
+ * @version $Id: ReadOnlyTabelModel.java,v 1.2 2007/05/02 20:16:14 cknudsen Exp
+ *          $
  */
 public class ReadOnlyTabelModel extends AbstractTableModel {
+	private static final long serialVersionUID = 1L;
 	private String[] columnNames = null;
 	private Object[][] data = null;
 	private int rows, cols;
@@ -73,6 +75,8 @@ public class ReadOnlyTabelModel extends AbstractTableModel {
 	 * cell. If we didn't implement this method, then the last column would
 	 * contain text ("true"/"false"), rather than a check box.
 	 */
+	@SuppressWarnings("unchecked")
+  @Override
 	public Class getColumnClass ( int c ) {
 		Object o = getValueAt ( 0, c );
 		if ( o == null )
@@ -84,6 +88,7 @@ public class ReadOnlyTabelModel extends AbstractTableModel {
 	/*
 	 * Don't need to implement this method unless your table's editable.
 	 */
+	@Override
 	public boolean isCellEditable ( int row, int col ) {
 		return false;
 	}
@@ -91,6 +96,7 @@ public class ReadOnlyTabelModel extends AbstractTableModel {
 	/*
 	 * Don't need to implement this method unless your table's data can change.
 	 */
+	@Override
 	public void setValueAt ( Object value, int row, int col ) {
 		data[row][col] = value;
 	}

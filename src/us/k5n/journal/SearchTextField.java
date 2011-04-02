@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 
 public class SearchTextField extends JTextField implements MouseListener,
     MouseMotionListener {
+  private static final long serialVersionUID = 1L;
 	public static ImageIcon clearImage = null;
 	private static byte[] clearImageBytes = { 71, 73, 70, 56, 57, 97, 14, 0, 14,
 	    0, -124, 26, 0, -60, 124, 124, -58, -126, -126, -58, -125, -125, -57,

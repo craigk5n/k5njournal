@@ -21,10 +21,8 @@ package us.k5n.journal;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
@@ -39,10 +37,11 @@ import javax.swing.table.TableModel;
  * Overide methods of JTable to customize: no cell editing, alternating
  * background colors for odd/even rows, resize to fit
  * 
- * @version $Id: ReadOnlyTable.java,v 1.3 2011-04-02 17:34:39 cknudsen Exp $
+ * @version $Id: ReadOnlyTable.java,v 1.4 2011-04-02 17:43:39 cknudsen Exp $
  * @author Craig Knudsen, craig@k5n.us
  */
 public class ReadOnlyTable extends JTable {
+  private static final long serialVersionUID = 1L;
 	int[] highlightedRows = null;
 	Color lightGray;
 	private boolean firstPaint = true;
@@ -190,6 +189,7 @@ public class ReadOnlyTable extends JTable {
 	// Implement table header tool tips.
 	protected JTableHeader createDefaultTableHeader () {
 		return new JTableHeader ( columnModel ) {
+      private static final long serialVersionUID = 1L;
 			public String getToolTipText ( MouseEvent e ) {
 				java.awt.Point p = e.getPoint ();
 				int index = columnModel.getColumnIndexAtX ( p.x );

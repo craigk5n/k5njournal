@@ -37,7 +37,7 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.4 2011-03-31 02:32:12 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.5 2011-04-02 17:43:39 cknudsen Exp $
  */
 public class Repository {
 	File directory;
@@ -263,7 +263,7 @@ public class Repository {
 			}
 		}
 		if ( dates.size () > 0 ) {
-			Collections.sort ( dates );
+			extracted ( dates );
 			listOfDates = new Date[dates.size ()];
 			for ( int i = 0; i < dates.size (); i++ ) {
 				listOfDates[i] = dates.elementAt ( i );
@@ -273,6 +273,11 @@ public class Repository {
 			listOfDates = null;
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+  private void extracted ( Vector<Date> dates ) {
+	  Collections.sort ( dates );
+  }
 
 	/**
 	 * Save the specified Journal object. If the Journal is part of an existing
