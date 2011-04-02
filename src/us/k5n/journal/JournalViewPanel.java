@@ -20,10 +20,10 @@
 package us.k5n.journal;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -35,13 +35,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -203,6 +201,7 @@ class IV extends JPanel {
 	BufferedImage image;
 	Rectangle r;
 	double scale, inc, min;
+	Cursor cursor;
 
 	public IV(byte[] imageData) {
 		loadImage ( imageData );
@@ -215,6 +214,8 @@ class IV extends JPanel {
 	}
 
 	protected void paintComponent ( Graphics g ) {
+		this.cursor = Cursor.getPredefinedCursor ( Cursor.HAND_CURSOR );
+		this.setCursor ( this.cursor );
 		super.paintComponent ( g );
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint ( RenderingHints.KEY_INTERPOLATION,
