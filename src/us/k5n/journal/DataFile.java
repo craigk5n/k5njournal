@@ -41,7 +41,7 @@ import us.k5n.ical.ParseError;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.5 2011-04-06 01:45:22 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.6 2011-04-06 01:57:58 cknudsen Exp $
  */
 public class DataFile extends File implements Constants {
 	private static final long serialVersionUID = 1L;
@@ -75,13 +75,16 @@ public class DataFile extends File implements Constants {
 						sb.append ( line );
 						sb.append ( "\n" );
 					}
+					System.out.println ( "PRE SIZE = "
+					    + parser.getDataStoreAt ( 0 ).getAllJournals ().size () );
 					String encryptedStr = sb.toString ();
-					//System.out.println ( "ENCRYPTED:\n" + encryptedStr );
-					String decryptedStr = Security.getInstance ().decrypt (
-					    encryptedStr );
+					// System.out.println ( "ENCRYPTED:\n" + encryptedStr );
+					String decryptedStr = Security.getInstance ().decrypt ( encryptedStr );
 					StringReader sr = new StringReader ( decryptedStr );
-					//System.out.println ( "DECRYPTED:\n" + decryptedStr );
+					System.out.println ( "DECRYPTED:\n" + decryptedStr );
 					parser.parse ( reader );
+					System.out.println ( "SIZE = "
+					    + parser.getDataStoreAt ( 0 ).getAllJournals ().size () );
 					reader.close ();
 					sr.close ();
 				} catch ( IOException e ) {
