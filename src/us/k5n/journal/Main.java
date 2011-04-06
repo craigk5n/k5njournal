@@ -27,6 +27,7 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -48,6 +49,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,6 +58,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -65,6 +68,7 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -89,16 +93,17 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.22 2011-04-02 20:58:16 cknudsen Exp $
+ * @version $Id: Main.java,v 1.23 2011-04-06 01:45:22 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
-    PropertyChangeListener, RepositoryChangeListener {
+    PropertyChangeListener, RepositoryChangeListener, PasswordAcceptedListener {
 	private static final long serialVersionUID = 1L;
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
 	public static final String VERSION = "0.3.1 (02 Apr 2011)";
 	JFrame parent;
 	JLabel messageArea;
+	Security security;
 	Repository dataRepository;
 	JTree dateTree;
 	DefaultMutableTreeNode dateTreeAllNode;
@@ -163,11 +168,20 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		setDefaultCloseOperation ( JFrame.EXIT_ON_CLOSE );
 		Container contentPane = getContentPane ();
 
-		// Load data
-		dataRepository = new Repository ( getDataDirectory (), false );
-		// Ask to be notified when the repository changes (user adds/edits
-		// an entry)
-		dataRepository.addChangeListener ( this );
+		// Setup security (encryption/decryption, etc.)
+		try {
+			this.security = new Security ( getDataDirectory () );
+		} catch ( IOException e ) {
+			System.err.println ( "Error initializing password system: " + e );
+			e.printStackTrace ();
+			System.exit ( 1 );
+		}
+
+		/*
+		 * // Load data dataRepository = new Repository ( getDataDirectory (), false
+		 * ); // Ask to be notified when the repository changes (user adds/edits //
+		 * an entry) dataRepository.addChangeListener ( this );
+		 */
 
 		// Create a menu bar
 		setJMenuBar ( createMenu () );
@@ -197,14 +211,62 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		// verticalSplit.addComponentListener ( this );
 		contentPane.add ( verticalSplit, BorderLayout.CENTER );
 
+		this.addComponentListener ( this );
+		this.setVisible ( true );
+
+		// See if user is still using default password.
+		if ( security.usingDefaultPassword () ) {
+			// Load data now
+			loadData ();
+			// warn user about default password.
+			showMessage ( "You are using the default password.\n" +
+					"If you would like to secure your journal entries,\n" +
+					"then you should set a new password.\n" +
+					"To do so, select \"New Password\" from the\nFile menu." );
+		} else {
+			// Data will be loaded after password is entered.
+			promptForPassword ();
+		}
+	}
+
+	private void promptForPassword () {
+		final JPasswordField jpf = new JPasswordField ();
+		JOptionPane jop = new JOptionPane ( jpf, JOptionPane.QUESTION_MESSAGE,
+		    JOptionPane.OK_CANCEL_OPTION );
+		JDialog dialog = jop.createDialog ( "Password:" );
+		/*
+		 * dialog.addComponentListener ( new ComponentAdapter () {
+		 * 
+		 * @Override public void componentShown ( ComponentEvent e ) {
+		 * SwingUtilities.invokeLater ( new Runnable () { public void run () {
+		 * jpf.requestFocusInWindow (); } } ); } } );
+		 */
+		dialog.setVisible ( true );
+		int result = (Integer) jop.getValue ();
+		dialog.dispose ();
+		char[] password = null;
+		if ( result == JOptionPane.OK_OPTION ) {
+			password = jpf.getPassword ();
+		}
+		if ( security.equals ( password ) ) {
+			System.out.println ( "Password correct!" );
+		} else {
+			System.out.println ( "Password incorrect" );
+		}
+	}
+
+	// Load data here once the user has entered a password.
+	public void loadData () {
+		// Load data
+		dataRepository = new Repository ( getDataDirectory (), false );
+		// Ask to be notified when the repository changes (user adds/edits
+		// an entry)
+		dataRepository.addChangeListener ( this );
 		// Populate Date JTree
 		updateDateTree ();
 		handleDateFilterSelection ( 0, null );
 		// filteredJournalEntries = dataRepository.getAllEntries ();
 		// updateFilteredJournalList ();
-
-		this.addComponentListener ( this );
-		this.setVisible ( true );
 	}
 
 	JToolBar createToolBar () {

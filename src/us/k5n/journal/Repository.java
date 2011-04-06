@@ -37,7 +37,7 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.5 2011-04-02 17:43:39 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.6 2011-04-06 01:45:22 cknudsen Exp $
  */
 public class Repository {
 	File directory;
@@ -58,20 +58,21 @@ public class Repository {
 
 		// Load all encrypted files first.
 		//TODO: implement!!!
-		/*
-		File[] files = this.directory.listFiles ( new EncFileFilter () );
-		for ( int i = 0; files != null && i < files.length; i++ ) {
-			DataFile f = new DataFile ( files[i].getAbsolutePath (), strictParsing, true );
+		File[] encfiles = this.directory.listFiles ( new EncFileFilter () );
+		System.out.println ( "Found " + encfiles.length + " encrypted files" );
+		for ( File encfile : encfiles ) {
+			System.out.println ( "Encrypted file: " + encfile );
+			DataFile f = new DataFile ( encfile.getAbsolutePath (), strictParsing, true );
 			if ( f != null ) {
+				System.out.println ( "Adding data file: " + f );
 				this.addDataFile ( f );
 			}
 		}
-		*/
 
 		// Load all files.
 		File []files = this.directory.listFiles ( new IcsFileFilter () );
-		for ( int i = 0; files != null && i < files.length; i++ ) {
-			DataFile f = new DataFile ( files[i].getAbsolutePath (), strictParsing, false );
+		for ( File file : files ) {
+			DataFile f = new DataFile ( file.getAbsolutePath (), strictParsing, false );
 			if ( f != null ) {
 				this.addDataFile ( f );
 			}

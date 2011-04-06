@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 
 import org.jasypt.util.text.BasicTextEncryptor;
 
@@ -40,10 +41,10 @@ import us.k5n.ical.ParseError;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.4 2011-04-02 21:13:28 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.5 2011-04-06 01:45:22 cknudsen Exp $
  */
 public class DataFile extends File implements Constants {
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	ICalendarParser parser;
 	DataStore dataStore;
 
@@ -64,13 +65,39 @@ public class DataFile extends File implements Constants {
 		super ( filename );
 		parser = new ICalendarParser ( strictParsing ? PARSE_STRICT : PARSE_LOOSE );
 		if ( this.exists () ) {
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader ( new FileReader ( this ) );
-				parser.parse ( reader );
-				reader.close ();
-			} catch ( IOException e ) {
-				System.err.println ( "Error opening " + toString () + ": " + e );
+			if ( encrypted ) {
+				BufferedReader reader = null;
+				StringBuilder sb = new StringBuilder ( (int) this.length () );
+				try {
+					reader = new BufferedReader ( new FileReader ( this ) );
+					String line;
+					while ( ( line = reader.readLine () ) != null ) {
+						sb.append ( line );
+						sb.append ( "\n" );
+					}
+					String encryptedStr = sb.toString ();
+					//System.out.println ( "ENCRYPTED:\n" + encryptedStr );
+					String decryptedStr = Security.getInstance ().decrypt (
+					    encryptedStr );
+					StringReader sr = new StringReader ( decryptedStr );
+					//System.out.println ( "DECRYPTED:\n" + decryptedStr );
+					parser.parse ( reader );
+					reader.close ();
+					sr.close ();
+				} catch ( IOException e ) {
+					System.err.println ( "Error opening " + toString () + ": " + e );
+					e.printStackTrace ();
+				}
+			} else {
+				BufferedReader reader = null;
+				try {
+					reader = new BufferedReader ( new FileReader ( this ) );
+					parser.parse ( reader );
+					reader.close ();
+				} catch ( IOException e ) {
+					System.err.println ( "Error opening " + toString () + ": " + e );
+					e.printStackTrace ();
+				}
 			}
 		}
 		dataStore = parser.getDataStoreAt ( 0 );
@@ -156,19 +183,23 @@ public class DataFile extends File implements Constants {
 	 * @throws IOException
 	 */
 	public void write () throws IOException {
-		FileWriter writer = null;
-		writer = new FileWriter ( this );
-		writer.write ( parser.toICalendar () );
-		writer.close ();
+		// FileWriter writer = null;
+		// writer = new FileWriter ( this );
+		// writer.write ( parser.toICalendar () );
+		// writer.close ();
 
 		// Now write encrypted file
 		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		String passphrase = Main.getPassphrase ();
-		textEncryptor.setPassword ( passphrase );
+		textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
 
 		File encFile = new File ( this + ".enc" );
-		writer = new FileWriter ( encFile );
+		FileWriter writer = new FileWriter ( encFile );
 		writer.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
 		writer.close ();
+	}
+
+	@Override
+	public String toString () {
+		return "DataFile [dataStore=" + dataStore + ", parser=" + parser + "]";
 	}
 }
