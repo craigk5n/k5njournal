@@ -27,7 +27,6 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -49,6 +48,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -68,7 +68,6 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -93,7 +92,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.24 2011-04-08 03:36:06 cknudsen Exp $
+ * @version $Id: Main.java,v 1.25 2011-04-08 22:48:20 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -230,29 +229,42 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	}
 
 	private void promptForPassword () {
-		final JPasswordField jpf = new JPasswordField ();
-		JOptionPane jop = new JOptionPane ( jpf, JOptionPane.QUESTION_MESSAGE,
-		    JOptionPane.OK_CANCEL_OPTION );
-		JDialog dialog = jop.createDialog ( "Password:" );
-		/*
-		 * dialog.addComponentListener ( new ComponentAdapter () {
-		 * 
-		 * @Override public void componentShown ( ComponentEvent e ) {
-		 * SwingUtilities.invokeLater ( new Runnable () { public void run () {
-		 * jpf.requestFocusInWindow (); } } ); } } );
-		 */
-		dialog.setVisible ( true );
-		int result = (Integer) jop.getValue ();
-		dialog.dispose ();
-		char[] password = null;
-		if ( result == JOptionPane.OK_OPTION ) {
-			password = jpf.getPassword ();
+		boolean done = false;
+		while ( !done ) {
+			final JPasswordField jpf = new JPasswordField ();
+			JOptionPane jop = new JOptionPane ( jpf, JOptionPane.QUESTION_MESSAGE,
+			    JOptionPane.OK_CANCEL_OPTION );
+			JDialog dialog = jop.createDialog ( "Password:" );
+			/*
+			 * dialog.addComponentListener ( new ComponentAdapter () {
+			 * 
+			 * @Override public void componentShown ( ComponentEvent e ) {
+			 * SwingUtilities.invokeLater ( new Runnable () { public void run () {
+			 * jpf.requestFocusInWindow (); } } ); } } );
+			 */
+			dialog.setVisible ( true );
+			int result = (Integer) jop.getValue ();
+			dialog.dispose ();
+			String password = null;
+			if ( result == JOptionPane.OK_OPTION ) {
+				password = new String ( jpf.getPassword () );
+			} else {
+				System.exit ( 0 );
+			}
+			try {
+				if ( security.passwordIsCorrect ( password ) ) {
+					System.out.println ( "Password correct!" );
+					done = true;
+				} else {
+					showError ( "Invalid password" );
+					System.out.println ( "Password incorrect" );
+				}
+			} catch ( IOException e ) {
+				showError ( "Error checking password: " + e );
+				e.printStackTrace ();
+			}
 		}
-		if ( security.equals ( password ) ) {
-			System.out.println ( "Password correct!" );
-		} else {
-			System.out.println ( "Password incorrect" );
-		}
+		loadData ();
 	}
 
 	// Load data here once the user has entered a password.
@@ -368,6 +380,18 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		} );
 		exportMenu.add ( item );
 		exportSelected = item;
+
+		fileMenu.addSeparator ();
+
+		item = new JMenuItem ( "Change Password" );
+		item.setAccelerator ( KeyStroke.getKeyStroke ( 'P', Toolkit
+		    .getDefaultToolkit ().getMenuShortcutKeyMask () ) );
+		item.addActionListener ( new ActionListener () {
+			public void actionPerformed ( ActionEvent event ) {
+				changePassword ();
+			}
+		} );
+		fileMenu.add ( item );
 
 		fileMenu.addSeparator ();
 
@@ -794,8 +818,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 	void showError ( String message ) {
 		System.err.println ( "Error: " + message );
-		JOptionPane
-		    .showMessageDialog ( parent, message, "Error", JOptionPane.ERROR );
+		JOptionPane.showMessageDialog ( parent, message, "Error",
+		    JOptionPane.ERROR_MESSAGE );
 	}
 
 	void fatalError ( String message ) {
@@ -1031,6 +1055,35 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 	protected static String getPassphrase () {
 		return passphrase;
+	}
+
+	void changePassword () {
+		boolean done = false;
+
+		while ( !done ) {
+			JPasswordField password1 = new JPasswordField ();
+			JPasswordField password2 = new JPasswordField ();
+
+			final JComponent[] inputs = new JComponent[] { new JLabel ( "Password" ),
+			    password1, new JLabel ( "Password (again)" ), password2 };
+			JOptionPane.showMessageDialog ( this, inputs, "Change Password",
+			    JOptionPane.PLAIN_MESSAGE );
+			String p1 = password1.getText ();
+			String p2 = password2.getText ();
+			if ( !p1.equals ( p2 ) ) {
+				showError ( "Passwords do not match." );
+			} else {
+				done = true;
+				try {
+					security.setNewPassword ( p1 );
+				} catch ( IOException e ) {
+					showError ( "Error saving new password:\n" + e );
+					e.printStackTrace ();
+				}
+				// System.out.println ( "new password: " + p1 );
+			}
+		}
+
 	}
 
 	/**

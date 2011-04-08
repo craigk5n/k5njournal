@@ -84,7 +84,7 @@ public class Security {
 	}
 
 	public void setNewPassword ( String newPassword ) throws IOException {
-		password = newPassword;
+		this.password = newPassword;
 		writeUserPasswordDigestFile ();
 		writePasswordFile ();
 	}
@@ -220,6 +220,7 @@ public class Security {
 		bw.write ( encryptedPassword + "\n" );
 		bw.close ();
 		fw.close ();
+		System.out.println ( "Wrote password: " + password );
 	}
 
 	/**
