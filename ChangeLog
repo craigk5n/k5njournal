@@ -1,7 +1,9 @@
 k5nJournal ChangeLog
-Version: $Id: ChangeLog,v 1.10 2011-04-02 20:58:16 cknudsen Exp $
+Version: $Id: ChangeLog,v 1.11 2011-04-08 23:58:29 cknudsen Exp $
 
-Version 0.3.1 (02 Apr 2011)
+Version 0.3.1 (08 Apr 2011)
+- Added password protection.  Files are encrypted with a default
+  password that the user can change at any time.
 - Bug fix: by default entries now show newest first in the list
 - Added support for attachments to journal entries.  Attachments
   are stored inline within the iCalendar data file.
