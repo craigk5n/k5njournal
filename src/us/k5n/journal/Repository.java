@@ -37,7 +37,7 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.6 2011-04-06 01:45:22 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.7 2011-04-08 03:36:06 cknudsen Exp $
  */
 public class Repository {
 	File directory;
@@ -61,10 +61,10 @@ public class Repository {
 		File[] encfiles = this.directory.listFiles ( new EncFileFilter () );
 		System.out.println ( "Found " + encfiles.length + " encrypted files" );
 		for ( File encfile : encfiles ) {
-			System.out.println ( "Encrypted file: " + encfile );
+			//System.out.println ( "Encrypted file: " + encfile );
 			DataFile f = new DataFile ( encfile.getAbsolutePath (), strictParsing, true );
 			if ( f != null ) {
-				System.out.println ( "Adding data file: " + f );
+				//System.out.println ( "Adding data file: " + f );
 				this.addDataFile ( f );
 			}
 		}

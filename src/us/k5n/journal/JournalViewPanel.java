@@ -47,7 +47,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.MouseInputAdapter;
 
-import org.apache.commons.codec.binary.Base64;
+import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 
 import us.k5n.ical.Attachment;
 import us.k5n.ical.Journal;

@@ -93,7 +93,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.23 2011-04-06 01:45:22 cknudsen Exp $
+ * @version $Id: Main.java,v 1.24 2011-04-08 03:36:06 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -219,10 +219,10 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			// Load data now
 			loadData ();
 			// warn user about default password.
-			showMessage ( "You are using the default password.\n" +
-					"If you would like to secure your journal entries,\n" +
-					"then you should set a new password.\n" +
-					"To do so, select \"New Password\" from the\nFile menu." );
+			showMessage ( "You are using the default password.\n"
+			    + "If you would like to secure your journal entries,\n"
+			    + "then you should set a new password.\n"
+			    + "To do so, select \"New Password\" from the\nFile menu." );
 		} else {
 			// Data will be loaded after password is entered.
 			promptForPassword ();
@@ -1075,7 +1075,7 @@ class SortableJournal implements Comparable {
 
 	public static Vector<Journal> sortJournals ( Vector<Journal> journals ) {
 		Vector<SortableJournal> sjs = new Vector<SortableJournal> ();
-		for ( int i = 0; i < journals.size (); i++ ) {
+		for ( int i = 0; journals != null && i < journals.size (); i++ ) {
 			Journal j = journals.elementAt ( i );
 			SortableJournal sj = new SortableJournal ( j );
 			sjs.addElement ( sj );

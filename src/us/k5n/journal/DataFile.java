@@ -32,6 +32,7 @@ import us.k5n.ical.DataStore;
 import us.k5n.ical.ICalendarParser;
 import us.k5n.ical.Journal;
 import us.k5n.ical.ParseError;
+import us.k5n.ical.ParseErrorListener;
 
 /**
  * Extend the File class to include iCalendar data created from parsing the
@@ -41,9 +42,9 @@ import us.k5n.ical.ParseError;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.6 2011-04-06 01:57:58 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.7 2011-04-08 03:36:06 cknudsen Exp $
  */
-public class DataFile extends File implements Constants {
+public class DataFile extends File implements Constants, ParseErrorListener {
 	private static final long serialVersionUID = 1L;
 	ICalendarParser parser;
 	DataStore dataStore;
@@ -64,27 +65,24 @@ public class DataFile extends File implements Constants {
 	public DataFile(String filename, boolean strictParsing, boolean encrypted) {
 		super ( filename );
 		parser = new ICalendarParser ( strictParsing ? PARSE_STRICT : PARSE_LOOSE );
+		parser.addParseErrorListener ( this );
 		if ( this.exists () ) {
 			if ( encrypted ) {
-				BufferedReader reader = null;
 				StringBuilder sb = new StringBuilder ( (int) this.length () );
 				try {
-					reader = new BufferedReader ( new FileReader ( this ) );
+					// Read encrypted text into StringBuffer. Create StringReader from
+					// input to mimic file reading since ICalParser wants a java.io.Reader
+					// object.
+					BufferedReader reader = new BufferedReader ( new FileReader ( this ) );
 					String line;
 					while ( ( line = reader.readLine () ) != null ) {
 						sb.append ( line );
 						sb.append ( "\n" );
 					}
-					System.out.println ( "PRE SIZE = "
-					    + parser.getDataStoreAt ( 0 ).getAllJournals ().size () );
 					String encryptedStr = sb.toString ();
-					// System.out.println ( "ENCRYPTED:\n" + encryptedStr );
 					String decryptedStr = Security.getInstance ().decrypt ( encryptedStr );
 					StringReader sr = new StringReader ( decryptedStr );
-					System.out.println ( "DECRYPTED:\n" + decryptedStr );
-					parser.parse ( reader );
-					System.out.println ( "SIZE = "
-					    + parser.getDataStoreAt ( 0 ).getAllJournals ().size () );
+					parser.parse ( sr );
 					reader.close ();
 					sr.close ();
 				} catch ( IOException e ) {
@@ -196,13 +194,14 @@ public class DataFile extends File implements Constants {
 		textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
 
 		File encFile = new File ( this + ".enc" );
-		FileWriter writer = new FileWriter ( encFile );
-		writer.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
-		writer.close ();
+		//System.out.println ( "Writing file: " + encFile.getAbsolutePath () );
+		FileWriter ewriter = new FileWriter ( encFile );
+		ewriter.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
+		ewriter.close ();
 	}
 
-	@Override
-	public String toString () {
-		return "DataFile [dataStore=" + dataStore + ", parser=" + parser + "]";
+	public void reportParseError ( ParseError error ) {
+		System.err.println ( "ICalendar Parse Error: line no. " + error.lineNo
+		    + ", data=" + error.inputData );
 	}
 }
