@@ -35,9 +35,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Vector;
@@ -50,7 +48,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -79,9 +76,7 @@ import javax.swing.tree.TreePath;
 
 import us.k5n.ical.Categories;
 import us.k5n.ical.Constants;
-import us.k5n.ical.DataStore;
 import us.k5n.ical.Description;
-import us.k5n.ical.ICalendarParser;
 import us.k5n.ical.Journal;
 import us.k5n.ical.Summary;
 
@@ -92,15 +87,16 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.25 2011-04-08 22:48:20 cknudsen Exp $
+ * @version $Id: Main.java,v 1.26 2011-04-09 16:27:53 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
     PropertyChangeListener, RepositoryChangeListener, PasswordAcceptedListener {
 	private static final long serialVersionUID = 1L;
 	public static final String DEFAULT_DIR_NAME = "k5njournal";
-	public static final String VERSION = "0.3.1 (02 Apr 2011)";
+	public static final String VERSION = "0.3.1 (08 Apr 2011)";
 	JFrame parent;
+	final MessageHandler messageHandler;
 	JLabel messageArea;
 	Security security;
 	Repository dataRepository;
@@ -125,15 +121,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	JTextField searchTextField;
 	JSplitPane verticalSplit = null, horizontalSplit = null;
 	String searchText = null;
-	private static String passphrase = "How Now Brown Cow";
 	private static File lastExportDirectory = null;
 	AppPreferences prefs;
-	static final String MAIN_WINDOW_HEIGHT = "MainWindow.height";
-	static final String MAIN_WINDOW_WIDTH = "MainWindow.width";
-	static final String MAIN_WINDOW_X = "MainWindow.x";
-	static final String MAIN_WINDOW_Y = "MainWindow.y";
-	static final String MAIN_WINDOW_VERTICAL_SPLIT_POSITION = "MainWindow.vSplitPanePosition";
-	static final String MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION = "MainWindow.hSplitPanePosition";
 
 	class DateFilterTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 1L;
@@ -166,6 +155,8 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 		setDefaultCloseOperation ( JFrame.EXIT_ON_CLOSE );
 		Container contentPane = getContentPane ();
+
+		this.messageHandler = new MessageHandler ( this );
 
 		// Setup security (encryption/decryption, etc.)
 		try {
@@ -218,7 +209,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			// Load data now
 			loadData ();
 			// warn user about default password.
-			showMessage ( "You are using the default password.\n"
+			messageHandler.showMessage ( "You are using the default password.\n"
 			    + "If you would like to secure your journal entries,\n"
 			    + "then you should set a new password.\n"
 			    + "To do so, select \"New Password\" from the\nFile menu." );
@@ -256,11 +247,11 @@ public class Main extends JFrame implements Constants, ComponentListener,
 					System.out.println ( "Password correct!" );
 					done = true;
 				} else {
-					showError ( "Invalid password" );
+					messageHandler.showError ( "Invalid password" );
 					System.out.println ( "Password incorrect" );
 				}
 			} catch ( IOException e ) {
-				showError ( "Error checking password: " + e );
+				messageHandler.showError ( "Error checking password: " + e );
 				e.printStackTrace ();
 			}
 		}
@@ -324,7 +315,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 						try {
 							dataRepository.deleteJournal ( j );
 						} catch ( IOException e1 ) {
-							showError ( "Error deleting." );
+							messageHandler.showError ( "Error deleting." );
 							e1.printStackTrace ();
 						}
 					}
@@ -361,21 +352,22 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		item = new JMenuItem ( "All" );
 		item.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
-				exportAll ();
+				Exporter.exportAll ( parent, dataRepository, messageHandler );
 			}
 		} );
 		exportMenu.add ( item );
 		item = new JMenuItem ( "Visible" );
 		item.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
-				exportVisible ();
+				Exporter
+				    .exportVisible ( parent, filteredJournalEntries, messageHandler );
 			}
 		} );
 		exportMenu.add ( item );
 		item = new JMenuItem ( "Selected" );
 		item.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
-				exportSelected ();
+				Exporter.exportSelected ( parent, journalListTable, messageHandler );
 			}
 		} );
 		exportMenu.add ( item );
@@ -788,45 +780,28 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		}
 		File f = new File ( s );
 		if ( f == null )
-			fatalError ( "Invalid user.home value '" + s + "'" );
+			messageHandler.fatalError ( "Invalid user.home value '" + s + "'" );
 		if ( !f.exists () )
-			fatalError ( "Home directory '" + f + "' does not exist." );
+			messageHandler.fatalError ( "Home directory '" + f + "' does not exist." );
 		if ( !f.isDirectory () )
-			fatalError ( "Home directory '" + f + "'is not a directory" );
+			messageHandler.fatalError ( "Home directory '" + f
+			    + "'is not a directory" );
 		// Use the home directory as the base. Data files will
 		// be stored in a subdirectory.
 		File dir = new File ( f, DEFAULT_DIR_NAME );
 		if ( !dir.exists () ) {
 			if ( !dir.mkdirs () )
-				fatalError ( "Unable to create data directory: " + dir );
-			showMessage ( "The following directory was created\n"
+				messageHandler.fatalError ( "Unable to create data directory: " + dir );
+			messageHandler.showMessage ( "The following directory was created\n"
 			    + "to store data files:\n\n" + dir );
 		}
 		if ( !dir.isDirectory () )
-			fatalError ( "Not a directory: " + dir );
+			messageHandler.fatalError ( "Not a directory: " + dir );
 		return dir;
 	}
 
 	void showStatusMessage ( String string ) {
 		this.messageArea.setText ( string );
-	}
-
-	void showMessage ( String message ) {
-		JOptionPane.showMessageDialog ( parent, message, "Notice",
-		    JOptionPane.INFORMATION_MESSAGE );
-	}
-
-	void showError ( String message ) {
-		System.err.println ( "Error: " + message );
-		JOptionPane.showMessageDialog ( parent, message, "Error",
-		    JOptionPane.ERROR_MESSAGE );
-	}
-
-	void fatalError ( String message ) {
-		System.err.println ( "Fatal error: " + message );
-		JOptionPane.showMessageDialog ( parent, message, "Fatal Error",
-		    JOptionPane.ERROR );
-		System.exit ( 1 );
 	}
 
 	protected JButton makeNavigationButton ( String imageName,
@@ -913,95 +888,6 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		}
 	}
 
-	protected void exportAll () {
-		export ( "Export All", dataRepository.getAllEntries () );
-	}
-
-	protected void exportVisible () {
-		export ( "Export Visible", filteredJournalEntries );
-	}
-
-	protected void exportSelected () {
-		Vector<Journal> selected = new Vector<Journal> ();
-		int[] sel = journalListTable.getSelectedRows ();
-		if ( sel == null || sel.length == 0 ) {
-			showError ( "You have not selected any entries" );
-			return;
-		}
-		for ( int i = 0; i < sel.length; i++ ) {
-			DisplayDate dd = (DisplayDate) journalListTable.getValueAt ( i, 0 );
-			Journal journal = (Journal) dd.getUserData ();
-			selected.addElement ( journal );
-		}
-		export ( "Export Selected", selected );
-	}
-
-	private void export ( String title, Vector<Journal> journalEntries ) {
-		JFileChooser fileChooser;
-		File outFile = null;
-
-		if ( lastExportDirectory == null )
-			fileChooser = new JFileChooser ();
-		else
-			fileChooser = new JFileChooser ( lastExportDirectory );
-		fileChooser.setFileSelectionMode ( JFileChooser.FILES_ONLY );
-		fileChooser.setFileFilter ( new ICSFileChooserFilter () );
-		fileChooser.setDialogTitle ( "Select Output File for " + title );
-		fileChooser.setApproveButtonText ( "Save as ICS File" );
-		fileChooser
-		    .setApproveButtonToolTipText ( "Export entries to iCalendar file" );
-		int ret = fileChooser.showOpenDialog ( this );
-		if ( ret == JFileChooser.APPROVE_OPTION ) {
-			outFile = fileChooser.getSelectedFile ();
-		} else {
-			// Cancel
-			return;
-		}
-		// If no file extension provided, use ".ics
-		String basename = outFile.getName ();
-		if ( basename.indexOf ( '.' ) < 0 ) {
-			// No filename extension provided, so add ".csv" to it
-			outFile = new File ( outFile.getParent (), basename + ".ics" );
-		}
-		System.out.println ( "Selected File: " + outFile.toString () );
-		lastExportDirectory = outFile.getParentFile ();
-		if ( outFile.exists () && !outFile.canWrite () ) {
-			JOptionPane.showMessageDialog ( parent,
-			    "You do not have the proper\npermissions to write to:\n\n"
-			        + outFile.toString () + "\n\nPlease select another file.",
-			    "Save Error", JOptionPane.PLAIN_MESSAGE );
-			return;
-		}
-		if ( outFile.exists () ) {
-			if ( JOptionPane.showConfirmDialog ( parent,
-			    "Overwrite existing file?\n\n" + outFile.toString (),
-			    "Overwrite Confirm", JOptionPane.YES_NO_OPTION ) != 0 ) {
-				JOptionPane.showMessageDialog ( parent, "Export canceled.",
-				    "Export canceled", JOptionPane.PLAIN_MESSAGE );
-				return;
-			}
-		}
-		try {
-			PrintWriter writer = new PrintWriter ( new FileWriter ( outFile ) );
-			// Now write!
-			ICalendarParser p = new ICalendarParser ( PARSE_LOOSE );
-			DataStore dataStore = p.getDataStoreAt ( 0 );
-			for ( int i = 0; i < journalEntries.size (); i++ ) {
-				Journal j = journalEntries.elementAt ( i );
-				dataStore.storeJournal ( j );
-			}
-			writer.write ( p.toICalendar () );
-			writer.close ();
-			JOptionPane.showMessageDialog ( parent, "Exported to:\n\n"
-			    + outFile.toString (), "Export", JOptionPane.PLAIN_MESSAGE );
-		} catch ( IOException e ) {
-			JOptionPane.showMessageDialog ( parent,
-			    "An error was encountered\nwriting to the file:\n\n"
-			        + e.getMessage (), "Save Error", JOptionPane.PLAIN_MESSAGE );
-			e.printStackTrace ();
-		}
-	}
-
 	public void componentHidden ( ComponentEvent ce ) {
 	}
 
@@ -1053,10 +939,6 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		handleDateFilterSelection ( 0, null );
 	}
 
-	protected static String getPassphrase () {
-		return passphrase;
-	}
-
 	void changePassword () {
 		boolean done = false;
 
@@ -1068,16 +950,16 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			    password1, new JLabel ( "Password (again)" ), password2 };
 			JOptionPane.showMessageDialog ( this, inputs, "Change Password",
 			    JOptionPane.PLAIN_MESSAGE );
-			String p1 = password1.getText ();
-			String p2 = password2.getText ();
+			String p1 = new String ( password1.getPassword () );
+			String p2 = new String ( password2.getPassword () );
 			if ( !p1.equals ( p2 ) ) {
-				showError ( "Passwords do not match." );
+				messageHandler.showError ( "Passwords do not match." );
 			} else {
 				done = true;
 				try {
 					security.setNewPassword ( p1 );
 				} catch ( IOException e ) {
-					showError ( "Error saving new password:\n" + e );
+					messageHandler.showError ( "Error saving new password:\n" + e );
 					e.printStackTrace ();
 				}
 				// System.out.println ( "new password: " + p1 );
