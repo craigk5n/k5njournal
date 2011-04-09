@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2011 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -87,7 +87,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.26 2011-04-09 16:27:53 cknudsen Exp $
+ * @version $Id: Main.java,v 1.27 2011-04-09 16:59:52 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
