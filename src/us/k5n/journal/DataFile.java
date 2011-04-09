@@ -42,12 +42,13 @@ import us.k5n.ical.ParseErrorListener;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.7 2011-04-08 03:36:06 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.8 2011-04-09 22:29:38 cknudsen Exp $
  */
 public class DataFile extends File implements Constants, ParseErrorListener {
 	private static final long serialVersionUID = 1L;
 	ICalendarParser parser;
 	DataStore dataStore;
+	private boolean isEncrypted = false;
 
 	public DataFile(String filename) {
 		this ( filename, false, false );
@@ -64,6 +65,7 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 */
 	public DataFile(String filename, boolean strictParsing, boolean encrypted) {
 		super ( filename );
+		this.isEncrypted = encrypted;
 		parser = new ICalendarParser ( strictParsing ? PARSE_STRICT : PARSE_LOOSE );
 		parser.addParseErrorListener ( this );
 		if ( this.exists () ) {
@@ -184,20 +186,22 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * @throws IOException
 	 */
 	public void write () throws IOException {
-		// FileWriter writer = null;
-		// writer = new FileWriter ( this );
-		// writer.write ( parser.toICalendar () );
-		// writer.close ();
+		if ( !isEncrypted ) {
+			FileWriter writer = null;
+			writer = new FileWriter ( this );
+			writer.write ( parser.toICalendar () );
+			writer.close ();
+		} else {
+			// Now write encrypted file
+			BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
+			textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
 
-		// Now write encrypted file
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
-
-		File encFile = new File ( this + ".enc" );
-		//System.out.println ( "Writing file: " + encFile.getAbsolutePath () );
-		FileWriter ewriter = new FileWriter ( encFile );
-		ewriter.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
-		ewriter.close ();
+			File encFile = new File ( this + ".enc" );
+			// System.out.println ( "Writing file: " + encFile.getAbsolutePath () );
+			FileWriter ewriter = new FileWriter ( encFile );
+			ewriter.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
+			ewriter.close ();
+		}
 	}
 
 	public void reportParseError ( ParseError error ) {

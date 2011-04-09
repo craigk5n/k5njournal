@@ -87,7 +87,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.27 2011-04-09 16:59:52 cknudsen Exp $
+ * @version $Id: Main.java,v 1.28 2011-04-09 22:29:38 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -212,7 +212,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			messageHandler.showMessage ( "You are using the default password.\n"
 			    + "If you would like to secure your journal entries,\n"
 			    + "then you should set a new password.\n"
-			    + "To do so, select \"New Password\" from the\nFile menu." );
+			    + "To do so, select \"Change Password\" from the\nFile menu." );
 		} else {
 			// Data will be loaded after password is entered.
 			promptForPassword ();

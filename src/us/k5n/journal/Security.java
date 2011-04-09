@@ -67,11 +67,13 @@ public class Security {
 		userPasswordDigestFile = new File ( baseDirectory,
 		    userPasswordDigestFileName );
 		if ( !keyExists () ) {
+			userValidated = true;
 			initialize ();
 		} else {
-			// auto-validate if using default password
-			if ( passwordIsCorrect ( DEFAULT_USER_PASSWORD ) ) {
-				userValidated = true;
+			// auto-validate with default password
+			if ( ! passwordIsCorrect ( DEFAULT_USER_PASSWORD ) ) {
+				throw new IllegalStateException (
+				    "Error authenticating with default password" );
 			}
 		}
 	}
@@ -84,6 +86,9 @@ public class Security {
 	}
 
 	public void setNewPassword ( String newPassword ) throws IOException {
+		if ( !userValidated )
+			throw new IllegalStateException (
+			    "Cannot set new password until user is authenticated" );
 		this.password = newPassword;
 		writeUserPasswordDigestFile ();
 		writePasswordFile ();
@@ -249,6 +254,8 @@ public class Security {
 	 * @throws IOException
 	 */
 	private void writePasswordFile () throws IOException {
+		if ( ! userValidated )
+			throw new IllegalStateException ( "User has not been validated" );
 		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
 		textEncryptor.setPassword ( password );
 		String encryptedPassword = textEncryptor.encrypt ( key );
