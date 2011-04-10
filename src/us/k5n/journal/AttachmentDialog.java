@@ -26,9 +26,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -46,7 +48,7 @@ import us.k5n.ical.ParseException;
  * <tt>showAttachmentDialog</tt> method. TODO: use a table to display file size.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: AttachmentDialog.java,v 1.4 2011-04-02 21:13:28 cknudsen Exp $
+ * @version $Id: AttachmentDialog.java,v 1.5 2011-04-10 17:22:09 cknudsen Exp $
  */
 public class AttachmentDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -55,6 +57,7 @@ public class AttachmentDialog extends JDialog {
 	boolean userAccepted = false;
 	JFrame parent;
 	private static File lastDirectory = null;
+	static ImageIcon okIcon, cancelIcon;
 
 	/**
 	 * Show the AttachmentDialog window that allows the user to modify the list of
@@ -83,6 +86,17 @@ public class AttachmentDialog extends JDialog {
 		JPanel buttonPanel = new JPanel ();
 		buttonPanel.setLayout ( new FlowLayout () );
 		JButton cancelButton = new JButton ( "Cancel" );
+		if ( cancelIcon == null ) {
+			URL imageURL = this.getClass ().getClassLoader ().getResource (
+			    "images/cancel.png" );
+			if ( imageURL == null ) {
+				System.err.println ( "Error: could not find cancel.png file" );
+			} else {
+				cancelIcon = new ImageIcon ( imageURL );
+			}
+		}
+		if ( cancelIcon != null )
+			cancelButton.setIcon ( cancelIcon );
 		cancelButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				cancel ();
@@ -91,6 +105,17 @@ public class AttachmentDialog extends JDialog {
 		buttonPanel.add ( cancelButton );
 
 		JButton okButton = new JButton ( "Ok" );
+		if ( okIcon == null ) {
+			URL imageURL = this.getClass ().getClassLoader ().getResource (
+			    "images/ok.png" );
+			if ( imageURL == null ) {
+				System.err.println ( "Error: could not find ok.png file" );
+			} else {
+				okIcon = new ImageIcon ( imageURL );
+			}
+		}
+		if ( okIcon != null )
+			okButton.setIcon ( okIcon );
 		okButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				ok ();

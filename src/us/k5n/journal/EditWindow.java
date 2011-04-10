@@ -26,9 +26,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -51,7 +53,7 @@ import us.k5n.ical.Summary;
  * Create a Journal entry edit window.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: EditWindow.java,v 1.7 2011-04-02 21:13:28 cknudsen Exp $
+ * @version $Id: EditWindow.java,v 1.8 2011-04-10 17:22:09 cknudsen Exp $
  */
 public class EditWindow extends JDialog implements ComponentListener {
 	private static final long serialVersionUID = 1L;
@@ -66,6 +68,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 	JLabel startDate;
 	JTextArea description;
 	AppPreferences prefs;
+	static ImageIcon saveIcon, cancelIcon;
 
 	public EditWindow(JFrame parent, Repository repo, Journal journal) {
 		super ( parent );
@@ -107,7 +110,6 @@ public class EditWindow extends JDialog implements ComponentListener {
 		this.addComponentListener ( this );
 	}
 
-	@SuppressWarnings("unchecked")
 	private Vector<Attachment> getAttachments () {
 		return this.journal.getAttachments ();
 	}
@@ -118,6 +120,17 @@ public class EditWindow extends JDialog implements ComponentListener {
 		JPanel buttonPanel = new JPanel ();
 		buttonPanel.setLayout ( new FlowLayout () );
 		JButton saveButton = new JButton ( "Save" );
+		if ( saveIcon == null ) {
+			URL imageURL = this.getClass ().getClassLoader ().getResource (
+			    "images/save.png" );
+			if ( imageURL == null ) {
+				System.err.println ( "Error: could not find save.png file" );
+			} else {
+				saveIcon = new ImageIcon ( imageURL );
+			}
+		}
+		if ( saveIcon != null )
+			saveButton.setIcon ( saveIcon );
 		saveButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				// Save (write file)
@@ -126,6 +139,17 @@ public class EditWindow extends JDialog implements ComponentListener {
 		} );
 		buttonPanel.add ( saveButton );
 		JButton closeButton = new JButton ( "Close" );
+		if ( cancelIcon == null ) {
+			URL imageURL = this.getClass ().getClassLoader ().getResource (
+			    "images/cancel.png" );
+			if ( imageURL == null ) {
+				System.err.println ( "Error: could not find cancel file" );
+			} else {
+				cancelIcon = new ImageIcon ( imageURL );
+			}
+		}
+		if ( cancelIcon != null )
+			closeButton.setIcon ( cancelIcon );
 		closeButton.addActionListener ( new ActionListener () {
 			public void actionPerformed ( ActionEvent event ) {
 				close ();

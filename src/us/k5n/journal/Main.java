@@ -87,7 +87,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.28 2011-04-09 22:29:38 cknudsen Exp $
+ * @version $Id: Main.java,v 1.29 2011-04-10 17:22:09 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -952,7 +952,10 @@ public class Main extends JFrame implements Constants, ComponentListener,
 			    JOptionPane.PLAIN_MESSAGE );
 			String p1 = new String ( password1.getPassword () );
 			String p2 = new String ( password2.getPassword () );
-			if ( !p1.equals ( p2 ) ) {
+			if ( p1 == null || p1.length () == 0 ) {
+				// cancel
+				done = true;
+			} else if ( !p1.equals ( p2 ) ) {
 				messageHandler.showError ( "Passwords do not match." );
 			} else {
 				done = true;
