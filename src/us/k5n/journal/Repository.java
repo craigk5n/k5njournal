@@ -37,7 +37,7 @@ import us.k5n.ical.Utils;
  * data if it is written back out.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Repository.java,v 1.7 2011-04-08 03:36:06 cknudsen Exp $
+ * @version $Id: Repository.java,v 1.8 2011-04-10 03:09:18 cknudsen Exp $
  */
 public class Repository {
 	File directory;
@@ -57,20 +57,21 @@ public class Repository {
 		this.categories = new Vector<String> ();
 
 		// Load all encrypted files first.
-		//TODO: implement!!!
+		// TODO: implement!!!
 		File[] encfiles = this.directory.listFiles ( new EncFileFilter () );
 		System.out.println ( "Found " + encfiles.length + " encrypted files" );
 		for ( File encfile : encfiles ) {
-			//System.out.println ( "Encrypted file: " + encfile );
-			DataFile f = new DataFile ( encfile.getAbsolutePath (), strictParsing, true );
+			// System.out.println ( "Encrypted file: " + encfile );
+			DataFile f = new DataFile ( encfile.getAbsolutePath (), strictParsing,
+			    true );
 			if ( f != null ) {
-				//System.out.println ( "Adding data file: " + f );
+				// System.out.println ( "Adding data file: " + f );
 				this.addDataFile ( f );
 			}
 		}
 
 		// Load all files.
-		File []files = this.directory.listFiles ( new IcsFileFilter () );
+		File[] files = this.directory.listFiles ( new IcsFileFilter () );
 		for ( File file : files ) {
 			DataFile f = new DataFile ( file.getAbsolutePath (), strictParsing, false );
 			if ( f != null ) {
@@ -94,6 +95,12 @@ public class Repository {
 		String YMD = Utils.DateToYYYYMMDD ( j.getStartDate () );
 		String fileName = YMD + ".ics";
 		DataFile dataFile = this.dataFileHash.get ( fileName );
+		if ( dataFile == null ) {
+			String fileName2 = fileName + ".enc";
+			DataFile dataFile2 = this.dataFileHash.get ( fileName2 );
+			if ( dataFile2 != null )
+				dataFile = dataFile2;
+		}
 		return dataFile;
 	}
 
@@ -276,9 +283,9 @@ public class Repository {
 	}
 
 	@SuppressWarnings("unchecked")
-  private void extracted ( Vector<Date> dates ) {
-	  Collections.sort ( dates );
-  }
+	private void extracted ( Vector<Date> dates ) {
+		Collections.sort ( dates );
+	}
 
 	/**
 	 * Save the specified Journal object. If the Journal is part of an existing
@@ -305,7 +312,7 @@ public class Repository {
 				File f = new File ( this.directory, Utils.DateToYYYYMMDD ( j
 				    .getStartDate () )
 				    + ".ics" );
-				dataFile = new DataFile ( f.getAbsolutePath () );
+				dataFile = new DataFile ( f.getAbsolutePath (), false, true );
 				dataFile.addJournal ( j );
 				this.addDataFile ( dataFile );
 			} else {

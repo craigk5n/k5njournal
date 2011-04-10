@@ -42,7 +42,7 @@ import us.k5n.ical.ParseErrorListener;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.8 2011-04-09 22:29:38 cknudsen Exp $
+ * @version $Id: DataFile.java,v 1.9 2011-04-10 03:09:18 cknudsen Exp $
  */
 public class DataFile extends File implements Constants, ParseErrorListener {
 	private static final long serialVersionUID = 1L;
@@ -50,9 +50,9 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	DataStore dataStore;
 	private boolean isEncrypted = false;
 
-	public DataFile(String filename) {
-		this ( filename, false, false );
-	}
+	// public DataFile(String filename) {
+	// this ( filename, false, false );
+	// }
 
 	/**
 	 * Create a DataFile object. If the specified filename exists, then it will be
@@ -196,7 +196,11 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 			BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
 			textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
 
-			File encFile = new File ( this + ".enc" );
+			File encFile = null;
+			if ( this.toString ().endsWith ( ".enc" ) )
+				encFile = this;
+			else
+				encFile = new File ( this + ".enc" );
 			// System.out.println ( "Writing file: " + encFile.getAbsolutePath () );
 			FileWriter ewriter = new FileWriter ( encFile );
 			ewriter.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
