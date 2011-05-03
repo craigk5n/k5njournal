@@ -87,7 +87,7 @@ import us.k5n.ical.Summary;
  * blog sites using the APIs for Blogger, MetaWeblog and Moveable Type.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: Main.java,v 1.29 2011-04-10 17:22:09 cknudsen Exp $
+ * @version $Id: Main.java,v 1.30 2011-05-03 14:38:01 cknudsen Exp $
  * 
  */
 public class Main extends JFrame implements Constants, ComponentListener,
@@ -481,8 +481,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		JPanel searchPanel = new JPanel ();
 		searchPanel.setBorder ( BorderFactory.createEmptyBorder ( 4, 4, 4, 4 ) );
 		searchPanel.setLayout ( new BorderLayout () );
-		URL imageURL = this.getClass ().getClassLoader ().getResource (
-		    "images/search.png" );
+		URL imageURL = getImage ( "search.png" );
 		ImageIcon icon = imageURL == null ? null : new ImageIcon ( imageURL );
 		JLabel searchLabel = new JLabel ();
 		searchLabel.setIcon ( icon );
@@ -508,16 +507,15 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		tc.setWidth ( 15 );
 		journalListTable.setColumnFixedWidth ( 0, 20 );
 
-		imageURL = this.getClass ().getClassLoader ().getResource (
-		    "images/clip.png" );
+		imageURL = getImage ( "clip.png" );
 		clipIcon = new ImageIcon ( imageURL );
 
 		// Set the text and icon values on the second column for the icon render
 		// journalListTable.getColumnModel ().getColumn ( 0 ).setHeaderValue (
 		// "Attachments" );
 		journalListTable.getColumnModel ().getColumn ( 0 ).setHeaderValue ( " " );
-		journalListTable.getColumnModel ().getColumn ( 0 ).setCellRenderer (
-		    new DefaultTableCellRenderer () {
+		journalListTable.getColumnModel ().getColumn ( 0 )
+		    .setCellRenderer ( new DefaultTableCellRenderer () {
 			    private static final long serialVersionUID = 1L;
 
 			    public Component getTableCellRendererComponent ( JTable tblDataTable,
@@ -804,18 +802,27 @@ public class Main extends JFrame implements Constants, ComponentListener,
 		this.messageArea.setText ( string );
 	}
 
+	private URL getImage ( String imageName ) {
+		URL ret = null;
+		if ( imageName != null ) {
+			ret = this.getClass ().getClassLoader ()
+			    .getResource ( "images/" + imageName );
+		}
+		if ( ret == null ) {
+			// try without "images/" (which might happen when running inside an IDE
+			// like Eclipse)
+			ret = this.getClass ().getClassLoader ().getResource ( imageName );
+		}
+		return ret;
+	}
+
 	protected JButton makeNavigationButton ( String imageName,
 	    String actionCommand, String toolTipText, String altText ) {
 		JButton button;
 		String imgLocation = null;
 		URL imageURL = null;
 
-		// Look for the image.
-		imgLocation = "images/" + imageName;
-		if ( imageName != null ) {
-			imgLocation = "images/" + imageName;
-			imageURL = this.getClass ().getClassLoader ().getResource ( imgLocation );
-		}
+		imageURL = getImage ( imageName );
 
 		if ( imageURL != null ) { // image found
 			button = new JButton ( altText );
