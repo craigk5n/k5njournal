@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
  * Class for handling popup messages (warning, info, ec.)
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: MessageHandler.java,v 1.2 2011-04-09 16:59:52 cknudsen Exp $
+ * @version $Id: MessageHandler.java,v 1.3 2016-01-08 13:23:53 cknudsen Exp $
  */
 public class MessageHandler {
 	JFrame parent;
@@ -49,7 +49,7 @@ public class MessageHandler {
 	void fatalError ( String message ) {
 		System.err.println ( "Fatal error: " + message );
 		JOptionPane.showMessageDialog ( parent, message, "Fatal Error",
-		    JOptionPane.ERROR );
+				JOptionPane.ERROR_MESSAGE );
 		System.exit ( 1 );
 	}
 }
