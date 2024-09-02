@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -42,7 +42,6 @@ import us.k5n.ical.ParseErrorListener;
  * duplicates.
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: DataFile.java,v 1.9 2011-04-10 03:09:18 cknudsen Exp $
  */
 public class DataFile extends File implements Constants, ParseErrorListener {
 	private static final long serialVersionUID = 1L;
@@ -60,73 +59,73 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * does not exists, then no parsing/loading will take place.
 	 * 
 	 * @param filename
-	 *          The filename (YYYYMMDD.ics as in "19991231.ics")
+	 *                      The filename (YYYYMMDD.ics as in "19991231.ics")
 	 * @param strictParsing
 	 */
 	public DataFile(String filename, boolean strictParsing, boolean encrypted) {
-		super ( filename );
+		super(filename);
 		this.isEncrypted = encrypted;
-		parser = new ICalendarParser ( strictParsing ? PARSE_STRICT : PARSE_LOOSE );
-		parser.addParseErrorListener ( this );
-		if ( this.exists () ) {
-			if ( encrypted ) {
-				StringBuilder sb = new StringBuilder ( (int) this.length () );
+		parser = new ICalendarParser(strictParsing ? PARSE_STRICT : PARSE_LOOSE);
+		parser.addParseErrorListener(this);
+		if (this.exists()) {
+			if (encrypted) {
+				StringBuilder sb = new StringBuilder((int) this.length());
 				try {
 					// Read encrypted text into StringBuffer. Create StringReader from
 					// input to mimic file reading since ICalParser wants a java.io.Reader
 					// object.
-					BufferedReader reader = new BufferedReader ( new FileReader ( this ) );
+					BufferedReader reader = new BufferedReader(new FileReader(this));
 					String line;
-					while ( ( line = reader.readLine () ) != null ) {
-						sb.append ( line );
-						sb.append ( "\n" );
+					while ((line = reader.readLine()) != null) {
+						sb.append(line);
+						sb.append("\n");
 					}
-					String encryptedStr = sb.toString ();
-					String decryptedStr = Security.getInstance ().decrypt ( encryptedStr );
-					StringReader sr = new StringReader ( decryptedStr );
-					parser.parse ( sr );
-					reader.close ();
-					sr.close ();
-				} catch ( IOException e ) {
-					System.err.println ( "Error opening " + toString () + ": " + e );
-					e.printStackTrace ();
+					String encryptedStr = sb.toString();
+					String decryptedStr = Security.getInstance().decrypt(encryptedStr);
+					StringReader sr = new StringReader(decryptedStr);
+					parser.parse(sr);
+					reader.close();
+					sr.close();
+				} catch (IOException e) {
+					System.err.println("Error opening " + toString() + ": " + e);
+					e.printStackTrace();
 				}
 			} else {
 				BufferedReader reader = null;
 				try {
-					reader = new BufferedReader ( new FileReader ( this ) );
-					parser.parse ( reader );
-					reader.close ();
-				} catch ( IOException e ) {
-					System.err.println ( "Error opening " + toString () + ": " + e );
-					e.printStackTrace ();
+					reader = new BufferedReader(new FileReader(this));
+					parser.parse(reader);
+					reader.close();
+				} catch (IOException e) {
+					System.err.println("Error opening " + toString() + ": " + e);
+					e.printStackTrace();
 				}
 			}
 		}
-		dataStore = parser.getDataStoreAt ( 0 );
+		dataStore = parser.getDataStoreAt(0);
 		// Store this DataFile object in the user data object of each
 		// Journal entry so we can get back to this object if the user
 		// edits and saves a Journal entry.
-		for ( int i = 0; i < getJournalCount (); i++ ) {
-			Journal j = journalEntryAt ( i );
-			j.setUserData ( this );
+		for (int i = 0; i < getJournalCount(); i++) {
+			Journal j = journalEntryAt(i);
+			j.setUserData(this);
 		}
 	}
 
-	public void addJournal ( Journal journal ) {
-		journal.setUserData ( this );
-		dataStore.storeJournal ( journal );
+	public void addJournal(Journal journal) {
+		journal.setUserData(this);
+		dataStore.storeJournal(journal);
 	}
 
 	private DataFile(ICalendarParser parser, String filename) {
-		super ( filename );
-		dataStore = parser.getDataStoreAt ( 0 );
+		super(filename);
+		dataStore = parser.getDataStoreAt(0);
 		// Store this DataFile object in the user data object of each
 		// Journal entry so we can get back to this object if the user
 		// edits and saves a Journal entry.
-		for ( int i = 0; i < getJournalCount (); i++ ) {
-			Journal j = journalEntryAt ( i );
-			j.setUserData ( this );
+		for (int i = 0; i < getJournalCount(); i++) {
+			Journal j = journalEntryAt(i);
+			j.setUserData(this);
 		}
 	}
 
@@ -135,30 +134,30 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * 
 	 * @return
 	 */
-	public int getJournalCount () {
-		return dataStore.getAllJournals ().size ();
+	public int getJournalCount() {
+		return dataStore.getAllJournals().size();
 	}
 
 	/**
 	 * Get the Journal entry at the specified location.
 	 * 
 	 * @param ind
-	 *          The index number (0 is first)
+	 *            The index number (0 is first)
 	 * @return
 	 */
-	public Journal journalEntryAt ( int ind ) {
-		return (Journal) dataStore.getAllJournals ().elementAt ( ind );
+	public Journal journalEntryAt(int ind) {
+		return (Journal) dataStore.getAllJournals().get(ind);
 	}
 
 	/**
-	 * Remove the Journal object at the specified location in the Vector of
+	 * Remove the Journal object at the specified location in the List of
 	 * entries.
 	 * 
 	 * @param ind
 	 * @return true if found and deleted
 	 */
-	public boolean removeJournal ( Journal journal ) {
-		return dataStore.getAllJournals ().remove ( journal );
+	public boolean removeJournal(Journal journal) {
+		return dataStore.getAllJournals().remove(journal);
 	}
 
 	/**
@@ -166,8 +165,8 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * 
 	 * @return
 	 */
-	public int getParseErrorCount () {
-		return parser.getAllErrors ().size ();
+	public int getParseErrorCount() {
+		return parser.getAllErrors().size();
 	}
 
 	/**
@@ -176,8 +175,8 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * @param ind
 	 * @return
 	 */
-	public ParseError getParseErrorAt ( int ind ) {
-		return (ParseError) parser.getAllErrors ().elementAt ( ind );
+	public ParseError getParseErrorAt(int ind) {
+		return (ParseError) parser.getAllErrors().get(ind);
 	}
 
 	/**
@@ -185,31 +184,31 @@ public class DataFile extends File implements Constants, ParseErrorListener {
 	 * 
 	 * @throws IOException
 	 */
-	public void write () throws IOException {
-		if ( !isEncrypted ) {
+	public void write() throws IOException {
+		if (!isEncrypted) {
 			FileWriter writer = null;
-			writer = new FileWriter ( this );
-			writer.write ( parser.toICalendar () );
-			writer.close ();
+			writer = new FileWriter(this);
+			writer.write(parser.toICalendar());
+			writer.close();
 		} else {
 			// Now write encrypted file
-			BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-			textEncryptor.setPassword ( Security.getInstance ().getEncryptionKey () );
+			BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+			textEncryptor.setPassword(Security.getInstance().getEncryptionKey());
 
 			File encFile = null;
-			if ( this.toString ().endsWith ( ".enc" ) )
+			if (this.toString().endsWith(".enc"))
 				encFile = this;
 			else
-				encFile = new File ( this + ".enc" );
+				encFile = new File(this + ".enc");
 			// System.out.println ( "Writing file: " + encFile.getAbsolutePath () );
-			FileWriter ewriter = new FileWriter ( encFile );
-			ewriter.write ( textEncryptor.encrypt ( parser.toICalendar () ) );
-			ewriter.close ();
+			FileWriter ewriter = new FileWriter(encFile);
+			ewriter.write(textEncryptor.encrypt(parser.toICalendar()));
+			ewriter.close();
 		}
 	}
 
-	public void reportParseError ( ParseError error ) {
-		System.err.println ( "ICalendar Parse Error: line no. " + error.lineNo
-		    + ", data=" + error.inputData );
+	public void reportParseError(ParseError error) {
+		System.err.println("ICalendar Parse Error: line no. " + error.lineNo
+				+ ", data=" + error.inputData);
 	}
 }

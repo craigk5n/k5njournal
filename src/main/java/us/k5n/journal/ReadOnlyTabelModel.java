@@ -26,8 +26,6 @@ import javax.swing.table.AbstractTableModel;
  * header.
  * 
  * @author Craig Knudsen, craig@kn.us.
- * @version $Id: ReadOnlyTabelModel.java,v 1.2 2007/05/02 20:16:14 cknudsen Exp
- *          $
  */
 public class ReadOnlyTabelModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;

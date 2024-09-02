@@ -25,7 +25,6 @@ package us.k5n.journal;
  * class abstracts out the details of where the info saved (Windows registry,
  * etc.)
  * 
- * @version $Id: AppPreferences.java,v 1.8 2011-03-31 02:32:12 cknudsen Exp $
  * @author Craig Knudsen, craig@k5n.us
  */
 public class AppPreferences {

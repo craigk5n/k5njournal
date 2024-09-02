@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
  * Class for handling popup messages (warning, info, ec.)
  * 
  * @author Craig Knudsen, craig@k5n.us
- * @version $Id: MessageHandler.java,v 1.3 2016-01-08 13:23:53 cknudsen Exp $
  */
 public class MessageHandler {
 	JFrame parent;
