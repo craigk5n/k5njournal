@@ -78,7 +78,7 @@ public class ReadOnlyTable extends JTable {
 		if (renderer == null) {
 			renderer = getDefaultRenderer(getColumnClass(vColIndex));
 		}
-		if (renderer==null)
+		if (renderer == null)
 			return null;
 
 		Component c = super.prepareRenderer(renderer, rowIndex, vColIndex);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,11 +29,11 @@ import java.io.FileFilter;
  */
 public class EncFileFilter implements FileFilter {
 
-	public boolean accept ( File pathname ) {
-		return pathname.toString ().toUpperCase ().endsWith ( "ICS.ENC" );
+	public boolean accept(File pathname) {
+		return pathname.toString().toUpperCase().endsWith("ICS.ENC");
 	}
-	
-	public String getDescription () {
+
+	public String getDescription() {
 		return "*.ics.enc (Encrypted iCalendar files)";
 	}
 

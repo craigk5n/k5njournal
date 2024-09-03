@@ -1,7 +1,7 @@
 package us.k5n.journal;
 
 /*
- * Copyright (C) 2005-2011 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -34,21 +34,21 @@ public class MessageHandler {
 		this.parent = parent;
 	}
 
-	void showMessage ( String message ) {
-		JOptionPane.showMessageDialog ( parent, message, "Notice",
-		    JOptionPane.INFORMATION_MESSAGE );
+	void showMessage(String message) {
+		JOptionPane.showMessageDialog(parent, message, "Notice",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	void showError ( String message ) {
-		System.err.println ( "Error: " + message );
-		JOptionPane.showMessageDialog ( parent, message, "Error",
-		    JOptionPane.ERROR_MESSAGE );
+	void showError(String message) {
+		System.err.println("Error: " + message);
+		JOptionPane.showMessageDialog(parent, message, "Error",
+				JOptionPane.ERROR_MESSAGE);
 	}
 
-	void fatalError ( String message ) {
-		System.err.println ( "Fatal error: " + message );
-		JOptionPane.showMessageDialog ( parent, message, "Fatal Error",
-				JOptionPane.ERROR_MESSAGE );
-		System.exit ( 1 );
+	void fatalError(String message) {
+		System.err.println("Fatal error: " + message);
+		JOptionPane.showMessageDialog(parent, message, "Fatal Error",
+				JOptionPane.ERROR_MESSAGE);
+		System.exit(1);
 	}
 }

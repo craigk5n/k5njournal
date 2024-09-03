@@ -1,18 +1,5 @@
-package us.k5n.journal;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.UUID;
-
-import org.jasypt.util.password.BasicPasswordEncryptor;
-import org.jasypt.util.text.BasicTextEncryptor;
-
 /*
- * Copyright (C) 2005-2011 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,6 +16,19 @@ import org.jasypt.util.text.BasicTextEncryptor;
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA.
  */
+
+package us.k5n.journal;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.UUID;
+
+import org.jasypt.util.password.BasicPasswordEncryptor;
+import org.jasypt.util.text.BasicTextEncryptor;
 
 /**
  * The Security object holds the passphrase used to encode and decode all the
@@ -59,39 +59,39 @@ public class Security {
 	private final String DEFAULT_USER_PASSWORD = "No user-supplied password yet";
 
 	public Security(File baseDirectory) throws IOException {
-		if ( instance != null )
-			throw new IllegalStateException (
-			    "Only once instance of Passphrase is allowed" );
+		if (instance != null)
+			throw new IllegalStateException(
+					"Only once instance of Passphrase is allowed");
 		instance = this;
-		systemPasswordFile = new File ( baseDirectory, systemPasswordFileName );
-		userPasswordDigestFile = new File ( baseDirectory,
-		    userPasswordDigestFileName );
-		if ( !keyExists () ) {
+		systemPasswordFile = new File(baseDirectory, systemPasswordFileName);
+		userPasswordDigestFile = new File(baseDirectory,
+				userPasswordDigestFileName);
+		if (!keyExists()) {
 			userValidated = true;
-			initialize ();
+			initialize();
 		} else {
 			// auto-validate with default password
-			if ( ! passwordIsCorrect ( DEFAULT_USER_PASSWORD ) ) {
-				throw new IllegalStateException (
-				    "Error authenticating with default password" );
+			if (!passwordIsCorrect(DEFAULT_USER_PASSWORD)) {
+				throw new IllegalStateException(
+						"Error authenticating with default password");
 			}
 		}
 	}
 
-	public static Security getInstance () throws IOException {
-		if ( instance == null )
-			throw new IllegalStateException (
-			    "Cannot invoke getInstance before calling constructor" );
+	public static Security getInstance() throws IOException {
+		if (instance == null)
+			throw new IllegalStateException(
+					"Cannot invoke getInstance before calling constructor");
 		return instance;
 	}
 
-	public void setNewPassword ( String newPassword ) throws IOException {
-		if ( !userValidated )
-			throw new IllegalStateException (
-			    "Cannot set new password until user is authenticated" );
+	public void setNewPassword(String newPassword) throws IOException {
+		if (!userValidated)
+			throw new IllegalStateException(
+					"Cannot set new password until user is authenticated");
 		this.password = newPassword;
-		writeUserPasswordDigestFile ();
-		writePasswordFile ();
+		writeUserPasswordDigestFile();
+		writePasswordFile();
 	}
 
 	/**
@@ -100,23 +100,23 @@ public class Security {
 	 * 
 	 * @return
 	 */
-	public boolean usingDefaultPassword () {
-		return password != null && password.equals ( DEFAULT_USER_PASSWORD );
+	public boolean usingDefaultPassword() {
+		return password != null && password.equals(DEFAULT_USER_PASSWORD);
 	}
 
 	/**
 	 * Encrypt some text
 	 * 
 	 * @param instr
-	 *          The text to encrypt
+	 *              The text to encrypt
 	 * @return the encrypted text
 	 */
-	public String encrypt ( String instr ) {
-		if ( !userValidated )
-			throw new IllegalStateException ( "User has not been validated" );
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		textEncryptor.setPassword ( key );
-		String encryptedText = textEncryptor.encrypt ( instr );
+	public String encrypt(String instr) {
+		if (!userValidated)
+			throw new IllegalStateException("User has not been validated");
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(key);
+		String encryptedText = textEncryptor.encrypt(instr);
 		return encryptedText;
 	}
 
@@ -124,19 +124,19 @@ public class Security {
 	 * Decrypt some text.
 	 * 
 	 * @param instr
-	 *          The text to descrypt
+	 *              The text to descrypt
 	 * @return the unencrypted text
 	 */
-	public String decrypt ( String instr ) {
-		if ( !userValidated )
-			throw new IllegalStateException ( "User has not been validated" );
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		textEncryptor.setPassword ( key );
-		String decryptedText = textEncryptor.decrypt ( instr );
+	public String decrypt(String instr) {
+		if (!userValidated)
+			throw new IllegalStateException("User has not been validated");
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(key);
+		String decryptedText = textEncryptor.decrypt(instr);
 		return decryptedText;
 	}
 
-	public String getEncryptionKey () {
+	public String getEncryptionKey() {
 		return key;
 	}
 
@@ -146,27 +146,27 @@ public class Security {
 	 * 
 	 * @return
 	 */
-	private boolean keyExists () {
-		return systemPasswordFile.exists ();
+	private boolean keyExists() {
+		return systemPasswordFile.exists();
 	}
 
-	private void initialize () throws IOException {
+	private void initialize() throws IOException {
 		password = DEFAULT_USER_PASSWORD;
 
 		// Write out the user password digest file. This will initially be based on
 		// our default user password.
-		writeUserPasswordDigestFile ();
+		writeUserPasswordDigestFile();
 
 		// Generate our system key. This will remain unchanged even if the user
 		// changes their password.
-		this.key = generateKey ();
+		this.key = generateKey();
 		// Now encrypt this using the user password (which is currently the default
 		// password).
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
 		// Set password to be user-defined password
-		textEncryptor.setPassword ( password );
+		textEncryptor.setPassword(password);
 
-		writePasswordFile ();
+		writePasswordFile();
 
 		userValidated = true;
 	}
@@ -177,8 +177,8 @@ public class Security {
 	 * 
 	 * @return
 	 */
-	private static String generateKey () {
-		return UUID.randomUUID ().toString ();
+	private static String generateKey() {
+		return UUID.randomUUID().toString();
 	}
 
 	/**
@@ -189,22 +189,22 @@ public class Security {
 	 * @return true if correct password, false otherwise
 	 * @throws IOException
 	 */
-	public boolean passwordIsCorrect ( String testPassword ) throws IOException {
+	public boolean passwordIsCorrect(String testPassword) throws IOException {
 		userValidated = false;
-		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor ();
-		FileReader fr = new FileReader ( userPasswordDigestFile );
-		BufferedReader br = new BufferedReader ( fr );
-		String passwordDigest = br.readLine ();
-		if ( passwordDigest == null )
-			throw new NullPointerException ( "Empty user password digest file" );
-		br.close ();
-		fr.close ();
-		userValidated = passwordEncryptor.checkPassword ( testPassword,
-		    passwordDigest );
-		if ( userValidated ) {
+		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+		FileReader fr = new FileReader(userPasswordDigestFile);
+		BufferedReader br = new BufferedReader(fr);
+		String passwordDigest = br.readLine();
+		if (passwordDigest == null)
+			throw new NullPointerException("Empty user password digest file");
+		br.close();
+		fr.close();
+		userValidated = passwordEncryptor.checkPassword(testPassword,
+				passwordDigest);
+		if (userValidated) {
 			this.password = testPassword;
 			// If correct, then load the key
-			readPasswordFile ();
+			readPasswordFile();
 		}
 		return userValidated;
 	}
@@ -217,15 +217,15 @@ public class Security {
 	 * 
 	 * @throws IOException
 	 */
-	private void writeUserPasswordDigestFile () throws IOException {
-		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor ();
-		String encryptedPassword = passwordEncryptor.encryptPassword ( password );
-		FileWriter fw = new FileWriter ( userPasswordDigestFile );
-		BufferedWriter bw = new BufferedWriter ( fw );
-		bw.write ( encryptedPassword + "\n" );
-		bw.close ();
-		fw.close ();
-		System.out.println ( "Wrote password: " + password );
+	private void writeUserPasswordDigestFile() throws IOException {
+		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+		String encryptedPassword = passwordEncryptor.encryptPassword(password);
+		FileWriter fw = new FileWriter(userPasswordDigestFile);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(encryptedPassword + "\n");
+		bw.close();
+		fw.close();
+		System.out.println("Wrote password: " + password);
 	}
 
 	/**
@@ -233,19 +233,19 @@ public class Security {
 	 * 
 	 * @throws IOException
 	 */
-	private void readPasswordFile () throws IOException {
-		if ( !userValidated )
-			throw new IllegalStateException ( "User is not validated" );
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		textEncryptor.setPassword ( password );
+	private void readPasswordFile() throws IOException {
+		if (!userValidated)
+			throw new IllegalStateException("User is not validated");
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(password);
 
-		FileReader fr = new FileReader ( systemPasswordFile );
-		BufferedReader br = new BufferedReader ( fr );
-		String encrypted = br.readLine ();
-		br.close ();
-		fr.close ();
+		FileReader fr = new FileReader(systemPasswordFile);
+		BufferedReader br = new BufferedReader(fr);
+		String encrypted = br.readLine();
+		br.close();
+		fr.close();
 
-		key = textEncryptor.decrypt ( encrypted );
+		key = textEncryptor.decrypt(encrypted);
 	}
 
 	/**
@@ -253,18 +253,18 @@ public class Security {
 	 * 
 	 * @throws IOException
 	 */
-	private void writePasswordFile () throws IOException {
-		if ( ! userValidated )
-			throw new IllegalStateException ( "User has not been validated" );
-		BasicTextEncryptor textEncryptor = new BasicTextEncryptor ();
-		textEncryptor.setPassword ( password );
-		String encryptedPassword = textEncryptor.encrypt ( key );
+	private void writePasswordFile() throws IOException {
+		if (!userValidated)
+			throw new IllegalStateException("User has not been validated");
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(password);
+		String encryptedPassword = textEncryptor.encrypt(key);
 
-		FileWriter fw = new FileWriter ( systemPasswordFile );
-		BufferedWriter bw = new BufferedWriter ( fw );
-		bw.write ( encryptedPassword + "\n" );
-		bw.close ();
-		fw.close ();
+		FileWriter fw = new FileWriter(systemPasswordFile);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(encryptedPassword + "\n");
+		bw.close();
+		fw.close();
 	}
 
 }

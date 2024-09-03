@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,37 +39,37 @@ public class DisplayDate implements Comparable<DisplayDate> {
 	Object userData;
 
 	public DisplayDate(Date d) {
-		this ( d, null );
+		this(d, null);
 	}
 
 	public DisplayDate(Date d, Object userData) {
-		if ( d == null ) {
+		if (d == null) {
 			javaDate = null;
 			hasTime = false;
 		} else {
-			javaDate = d.toCalendar ().getTime ();
-			hasTime = !d.isDateOnly ();
+			javaDate = d.toCalendar().getTime();
+			hasTime = !d.isDateOnly();
 		}
 		this.userData = userData;
 	}
 
-	public String toString () {
+	public String toString() {
 		SimpleDateFormat format = null;
-		if ( javaDate == null )
+		if (javaDate == null)
 			return "Unknown Date";
-		if ( hasTime )
-			format = new SimpleDateFormat ( dateTimeFormat );
+		if (hasTime)
+			format = new SimpleDateFormat(dateTimeFormat);
 		else
-			format = new SimpleDateFormat ( dateOnlyFormat );
-		return format.format ( javaDate );
+			format = new SimpleDateFormat(dateOnlyFormat);
+		return format.format(javaDate);
 	}
 
-	public Object getUserData () {
+	public Object getUserData() {
 		return this.userData;
 	}
 
-	public int compareTo ( DisplayDate d2 ) {
-		return javaDate.compareTo ( d2.javaDate );
+	public int compareTo(DisplayDate d2) {
+		return javaDate.compareTo(d2.javaDate);
 	}
 
 }

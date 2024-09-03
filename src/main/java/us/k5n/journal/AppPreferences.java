@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,18 +43,19 @@ public class AppPreferences {
 
 	static final String ENCRYPTION_KEY = "Encryption.key";
 	// TODO: support JDK6 strong encryption using the
-	// "Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files"
+	// "Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy
+	// Files"
 
 	private static AppPreferences instance = null;
 
 	public AppPreferences() {
-		this.prefs = java.util.prefs.Preferences.userNodeForPackage ( this
-		    .getClass () );
+		this.prefs = java.util.prefs.Preferences.userNodeForPackage(this
+				.getClass());
 	}
 
-	public static AppPreferences getInstance () {
-		if ( instance == null )
-			instance = new AppPreferences ();
+	public static AppPreferences getInstance() {
+		if (instance == null)
+			instance = new AppPreferences();
 		return instance;
 	}
 
@@ -63,18 +64,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowHeight () {
-		return prefs.getInt ( MAIN_WINDOW_HEIGHT, 600 );
+	public int getMainWindowHeight() {
+		return prefs.getInt(MAIN_WINDOW_HEIGHT, 600);
 	}
 
 	/**
 	 * Set height of main window
 	 * 
 	 * @param mainWindowHeight
-	 *          height of main window (pixels)
+	 *                         height of main window (pixels)
 	 */
-	public void setMainWindowHeight ( int mainWindowHeight ) {
-		prefs.putInt ( MAIN_WINDOW_HEIGHT, mainWindowHeight );
+	public void setMainWindowHeight(int mainWindowHeight) {
+		prefs.putInt(MAIN_WINDOW_HEIGHT, mainWindowHeight);
 	}
 
 	/**
@@ -83,8 +84,8 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowHorizontalSplitPosition () {
-		return prefs.getInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, 185 );
+	public int getMainWindowHorizontalSplitPosition() {
+		return prefs.getInt(MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION, 185);
 	}
 
 	/**
@@ -92,13 +93,13 @@ public class AppPreferences {
 	 * pixels.
 	 * 
 	 * @param mainWindowHorizontalSplitPosition
-	 *          The new divider location (in pixels)
+	 *                                          The new divider location (in pixels)
 	 * @return
 	 */
-	public void setMainWindowHorizontalSplitPosition (
-	    int mainWindowHorizontalSplitPosition ) {
-		prefs.putInt ( MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION,
-		    mainWindowHorizontalSplitPosition );
+	public void setMainWindowHorizontalSplitPosition(
+			int mainWindowHorizontalSplitPosition) {
+		prefs.putInt(MAIN_WINDOW_HORIZONTAL_SPLIT_POSITION,
+				mainWindowHorizontalSplitPosition);
 	}
 
 	/**
@@ -107,8 +108,8 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowVerticalSplitPosition () {
-		return prefs.getInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION, 200 );
+	public int getMainWindowVerticalSplitPosition() {
+		return prefs.getInt(MAIN_WINDOW_VERTICAL_SPLIT_POSITION, 200);
 	}
 
 	/**
@@ -116,13 +117,13 @@ public class AppPreferences {
 	 * pixels.
 	 * 
 	 * @param mainWindowVerticalSplitPosition
-	 *          The new divider location (in pixels)
+	 *                                        The new divider location (in pixels)
 	 * @return
 	 */
-	public void setMainWindowVerticalSplitPosition (
-	    int mainWindowVerticalSplitPosition ) {
-		prefs.putInt ( MAIN_WINDOW_VERTICAL_SPLIT_POSITION,
-		    mainWindowVerticalSplitPosition );
+	public void setMainWindowVerticalSplitPosition(
+			int mainWindowVerticalSplitPosition) {
+		prefs.putInt(MAIN_WINDOW_VERTICAL_SPLIT_POSITION,
+				mainWindowVerticalSplitPosition);
 	}
 
 	/**
@@ -130,18 +131,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowWidth () {
-		return prefs.getInt ( MAIN_WINDOW_WIDTH, 600 );
+	public int getMainWindowWidth() {
+		return prefs.getInt(MAIN_WINDOW_WIDTH, 600);
 	}
 
 	/**
 	 * Set main window width
 	 * 
 	 * @param mainWindowWidth
-	 *          width of main window (in pixels)
+	 *                        width of main window (in pixels)
 	 */
-	public void setMainWindowWidth ( int mainWindowWidth ) {
-		prefs.putInt ( MAIN_WINDOW_WIDTH, mainWindowWidth );
+	public void setMainWindowWidth(int mainWindowWidth) {
+		prefs.putInt(MAIN_WINDOW_WIDTH, mainWindowWidth);
 	}
 
 	/**
@@ -149,18 +150,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowX () {
-		return prefs.getInt ( MAIN_WINDOW_X, 15 );
+	public int getMainWindowX() {
+		return prefs.getInt(MAIN_WINDOW_X, 15);
 	}
 
 	/**
 	 * Set the main window X position
 	 * 
 	 * @param mainWindowX
-	 *          The X position of the main window
+	 *                    The X position of the main window
 	 */
-	public void setMainWindowX ( int mainWindowX ) {
-		prefs.putInt ( MAIN_WINDOW_X, mainWindowX );
+	public void setMainWindowX(int mainWindowX) {
+		prefs.putInt(MAIN_WINDOW_X, mainWindowX);
 	}
 
 	/**
@@ -168,18 +169,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getMainWindowY () {
-		return prefs.getInt ( MAIN_WINDOW_Y, 15 );
+	public int getMainWindowY() {
+		return prefs.getInt(MAIN_WINDOW_Y, 15);
 	}
 
 	/**
 	 * Set the main window Y position
 	 * 
 	 * @param mainWindowY
-	 *          The main window Y position
+	 *                    The main window Y position
 	 */
-	public void setMainWindowY ( int mainWindowY ) {
-		prefs.putInt ( MAIN_WINDOW_Y, mainWindowY );
+	public void setMainWindowY(int mainWindowY) {
+		prefs.putInt(MAIN_WINDOW_Y, mainWindowY);
 	}
 
 	/**
@@ -187,18 +188,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getEditWindowWidth () {
-		return prefs.getInt ( EDIT_WINDOW_WIDTH, 600 );
+	public int getEditWindowWidth() {
+		return prefs.getInt(EDIT_WINDOW_WIDTH, 600);
 	}
 
 	/**
 	 * Set edit window width
 	 * 
 	 * @param editWindowWidth
-	 *          width of edit window (in pixels)
+	 *                        width of edit window (in pixels)
 	 */
-	public void setEditWindowWidth ( int editWindowWidth ) {
-		prefs.putInt ( EDIT_WINDOW_WIDTH, editWindowWidth );
+	public void setEditWindowWidth(int editWindowWidth) {
+		prefs.putInt(EDIT_WINDOW_WIDTH, editWindowWidth);
 	}
 
 	/**
@@ -206,18 +207,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getEditWindowHeight () {
-		return prefs.getInt ( EDIT_WINDOW_HEIGHT, 600 );
+	public int getEditWindowHeight() {
+		return prefs.getInt(EDIT_WINDOW_HEIGHT, 600);
 	}
 
 	/**
 	 * Set edit window width
 	 * 
 	 * @param editWindowWidth
-	 *          width of edit window (in pixels)
+	 *                        width of edit window (in pixels)
 	 */
-	public void setEditWindowHeight ( int editWindowHeight ) {
-		prefs.putInt ( EDIT_WINDOW_HEIGHT, editWindowHeight );
+	public void setEditWindowHeight(int editWindowHeight) {
+		prefs.putInt(EDIT_WINDOW_HEIGHT, editWindowHeight);
 	}
 
 	/**
@@ -225,18 +226,18 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getEditWindowX () {
-		return prefs.getInt ( EDIT_WINDOW_X, 15 );
+	public int getEditWindowX() {
+		return prefs.getInt(EDIT_WINDOW_X, 15);
 	}
 
 	/**
 	 * Set the edit window X position
 	 * 
 	 * @param editWindowX
-	 *          The X position of the main window
+	 *                    The X position of the main window
 	 */
-	public void setEditWindowX ( int editWindowX ) {
-		prefs.putInt ( EDIT_WINDOW_X, editWindowX );
+	public void setEditWindowX(int editWindowX) {
+		prefs.putInt(EDIT_WINDOW_X, editWindowX);
 	}
 
 	/**
@@ -244,32 +245,32 @@ public class AppPreferences {
 	 * 
 	 * @return
 	 */
-	public int getEditWindowY () {
-		return prefs.getInt ( EDIT_WINDOW_Y, 15 );
+	public int getEditWindowY() {
+		return prefs.getInt(EDIT_WINDOW_Y, 15);
 	}
 
 	/**
 	 * Set the edit window Y position
 	 * 
 	 * @param editWindowY
-	 *          The Y position of the main window
+	 *                    The Y position of the main window
 	 */
-	public void setEditWindowY ( int editWindowY ) {
-		prefs.putInt ( EDIT_WINDOW_Y, editWindowY );
+	public void setEditWindowY(int editWindowY) {
+		prefs.putInt(EDIT_WINDOW_Y, editWindowY);
 	}
 
 	/**
 	 * Get encryption key.
 	 */
-	public String getEncryptionKey () {
-		return prefs.get ( ENCRYPTION_KEY, null );
+	public String getEncryptionKey() {
+		return prefs.get(ENCRYPTION_KEY, null);
 	}
 
 	/**
 	 * Set encryption key.
 	 */
-	public void setEncryptionKey ( String key ) {
-		prefs.put ( ENCRYPTION_KEY, key );
+	public void setEncryptionKey(String key) {
+		prefs.put(ENCRYPTION_KEY, key);
 	}
 
 }

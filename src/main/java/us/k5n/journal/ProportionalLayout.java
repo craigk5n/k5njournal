@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Craig Knudsen
+ * Copyright (C) 2005-2024 Craig Knudsen
  *
  * k5nJournal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,53 +45,61 @@ public class ProportionalLayout implements LayoutManager {
 	 * component proportions
 	 * 
 	 * @param proportions
-	 *          An int array of values indicating horizontal proportions. An array
-	 *          of 2,1,1 would give the first component added half the space
-	 *          horizontally, the second and the third would each get a quarter.
-	 *          More components would not be given any space at all. When there
-	 *          are less than the expected number of components the unused values
-	 *          in the proportions array will correspond to blank space in the
-	 *          layout.
+	 *                    An int array of values indicating horizontal proportions.
+	 *                    An array
+	 *                    of 2,1,1 would give the first component added half the
+	 *                    space
+	 *                    horizontally, the second and the third would each get a
+	 *                    quarter.
+	 *                    More components would not be given any space at all. When
+	 *                    there
+	 *                    are less than the expected number of components the unused
+	 *                    values
+	 *                    in the proportions array will correspond to blank space in
+	 *                    the
+	 *                    layout.
 	 * @param orientation
-	 *          specified whether the layout is vertical (VERTICAL_LAYOUT) or
-	 *          horizontal (HORIZONTAL_LAYOUT).
+	 *                    specified whether the layout is vertical (VERTICAL_LAYOUT)
+	 *                    or
+	 *                    horizontal (HORIZONTAL_LAYOUT).
 	 */
 	public ProportionalLayout(int[] proportions, int orientation) {
 		this.proportions = proportions;
 		this.orientation = orientation;
 		num = proportions.length;
-		for ( int i = 0; i < num; i++ ) {
+		for (int i = 0; i < num; i++) {
 			int prop = proportions[i];
 			total += prop;
 		}
 	}
 
-	private Dimension layoutSize ( Container parent, boolean minimum ) {
-		Dimension dim = new Dimension ( 0, 0 );
-		synchronized ( parent.getTreeLock () ) {
-			int n = parent.getComponentCount ();
+	private Dimension layoutSize(Container parent, boolean minimum) {
+		Dimension dim = new Dimension(0, 0);
+		synchronized (parent.getTreeLock()) {
+			int n = parent.getComponentCount();
 			int cnt = 0;
-			for ( int i = 0; i < n; i++ ) {
-				Component c = parent.getComponent ( i );
-				if ( c.isVisible () ) {
-					Dimension d = ( minimum ) ? c.getMinimumSize () : c
-					    .getPreferredSize ();
-					if ( this.orientation == HORIZONTAL_LAYOUT ) {
+			for (int i = 0; i < n; i++) {
+				Component c = parent.getComponent(i);
+				if (c.isVisible()) {
+					Dimension d = (minimum) ? c.getMinimumSize()
+							: c
+									.getPreferredSize();
+					if (this.orientation == HORIZONTAL_LAYOUT) {
 						dim.width += d.width;
-						if ( d.height > dim.height )
+						if (d.height > dim.height)
 							dim.height = d.height;
 					} else {
 						dim.height += d.height;
-						if ( d.width > dim.width )
+						if (d.width > dim.width)
 							dim.width = d.width;
 					}
 				}
 				cnt++;
-				if ( cnt == num )
+				if (cnt == num)
 					break;
 			}
 		}
-		Insets insets = parent.getInsets ();
+		Insets insets = parent.getInsets();
 		dim.width += insets.left + insets.right;
 		dim.height += insets.top + insets.bottom;
 		return dim;
@@ -100,65 +108,65 @@ public class ProportionalLayout implements LayoutManager {
 	/**
 	 * Lays out the container.
 	 */
-	public void layoutContainer ( Container parent ) {
-		Insets insets = parent.getInsets ();
-		synchronized ( parent.getTreeLock () ) {
-			int n = parent.getComponentCount ();
-			Dimension pd = parent.getSize ();
+	public void layoutContainer(Container parent) {
+		Insets insets = parent.getInsets();
+		synchronized (parent.getTreeLock()) {
+			int n = parent.getComponentCount();
+			Dimension pd = parent.getSize();
 			// do layout
 			int cnt = 0;
 			int totalwid = pd.width - insets.left - insets.right;
 			int totalhei = pd.height - insets.top - insets.bottom;
 			int x = insets.left;
 			int y = insets.top;
-			for ( int i = 0; i < n; i++ ) {
-				Component c = parent.getComponent ( i );
-				if ( this.orientation == HORIZONTAL_LAYOUT ) {
+			for (int i = 0; i < n; i++) {
+				Component c = parent.getComponent(i);
+				if (this.orientation == HORIZONTAL_LAYOUT) {
 					int wid = proportions[i] * totalwid / total;
-					c.setBounds ( x, y, wid, pd.height - insets.bottom - insets.top );
+					c.setBounds(x, y, wid, pd.height - insets.bottom - insets.top);
 					x += wid;
 				} else {
 					int hei = proportions[i] * totalhei / total;
-					c.setBounds ( x, y, pd.width - insets.left - insets.right, hei );
+					c.setBounds(x, y, pd.width - insets.left - insets.right, hei);
 					y += hei;
 				}
 				cnt++;
-				if ( cnt == num )
+				if (cnt == num)
 					break;
 			}
 		}
 	}
 
-	public Dimension minimumLayoutSize ( Container parent ) {
-		return layoutSize ( parent, false );
+	public Dimension minimumLayoutSize(Container parent) {
+		return layoutSize(parent, false);
 	}
 
-	public Dimension preferredLayoutSize ( Container parent ) {
-		return layoutSize ( parent, false );
-	}
-
-	/**
-	 * Not used by this class
-	 */
-	public void addLayoutComponent ( String name, Component comp ) {
+	public Dimension preferredLayoutSize(Container parent) {
+		return layoutSize(parent, false);
 	}
 
 	/**
 	 * Not used by this class
 	 */
-	public void removeLayoutComponent ( Component comp ) {
+	public void addLayoutComponent(String name, Component comp) {
 	}
 
-	public String toString () {
-		StringBuffer sb = new StringBuffer ();
-		sb.append ( getClass ().getName () ).append ( '[' );
+	/**
+	 * Not used by this class
+	 */
+	public void removeLayoutComponent(Component comp) {
+	}
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(getClass().getName()).append('[');
 		int len = proportions.length;
-		for ( int i = 0; i < len; i++ ) {
-			sb.append ( 'p' ).append ( i ).append ( '=' ).append ( proportions[i] );
-			if ( i != len - 1 )
-				sb.append ( ',' );
+		for (int i = 0; i < len; i++) {
+			sb.append('p').append(i).append('=').append(proportions[i]);
+			if (i != len - 1)
+				sb.append(',');
 		}
-		sb.append ( ']' );
-		return sb.toString ();
+		sb.append(']');
+		return sb.toString();
 	}
 }
