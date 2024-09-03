@@ -142,7 +142,7 @@ public class Repository {
 		List<Integer> months = new ArrayList<Integer>();
 		for (int i = 0; i < listOfDates.length; i++) {
 			if (listOfDates[i].getYear() == year) {
-				Integer ival = new Integer(listOfDates[i].getMonth());
+				Integer ival = Integer.valueOf(listOfDates[i].getMonth());
 				if (!h.containsKey(ival)) {
 					h.put(ival, ival);
 					months.add(ival);

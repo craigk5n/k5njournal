@@ -193,14 +193,15 @@ public class Security {
 		userValidated = false;
 		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
 		FileReader fr = new FileReader(userPasswordDigestFile);
-		BufferedReader br = new BufferedReader(fr);
-		String passwordDigest = br.readLine();
-		if (passwordDigest == null)
-			throw new NullPointerException("Empty user password digest file");
-		br.close();
-		fr.close();
-		userValidated = passwordEncryptor.checkPassword(testPassword,
-				passwordDigest);
+		try (BufferedReader br = new BufferedReader(fr)) {
+			String passwordDigest = br.readLine();
+			if (passwordDigest == null)
+				throw new NullPointerException("Empty user password digest file");
+			br.close();
+			fr.close();
+			userValidated = passwordEncryptor.checkPassword(testPassword,
+					passwordDigest);
+		}
 		if (userValidated) {
 			this.password = testPassword;
 			// If correct, then load the key

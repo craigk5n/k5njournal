@@ -120,7 +120,6 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	JTextField searchTextField;
 	JSplitPane verticalSplit = null, horizontalSplit = null;
 	String searchText = null;
-	private static File lastExportDirectory = null;
 	AppPreferences prefs;
 
 	class DateFilterTreeNode extends DefaultMutableTreeNode {
@@ -376,7 +375,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 		item = new JMenuItem("Change Password");
 		item.setAccelerator(KeyStroke.getKeyStroke('P', Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
+				.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				changePassword();
@@ -388,7 +387,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 		item = new JMenuItem("Exit");
 		item.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
+				.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				// TODO: check for unsaved changes
@@ -417,7 +416,7 @@ public class Main extends JFrame implements Constants, ComponentListener,
 
 		item = new JMenuItem("About...");
 		item.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit
-				.getDefaultToolkit().getMenuShortcutKeyMask()));
+				.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				// TODO: add logo, etc...

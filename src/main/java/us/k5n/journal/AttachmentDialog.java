@@ -135,7 +135,6 @@ public class AttachmentDialog extends JDialog {
 		this.setVisible(true);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Attachment> cloneAttachments(List<Attachment> attachments) {
 		return (List<Attachment>) (attachments == null ? new ArrayList<Attachment>()
 				: new ArrayList<Attachment>(attachments));
