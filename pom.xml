@@ -71,7 +71,126 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>jpackage-maven-plugin</artifactId>
+        <version>1.6.5</version>
+      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- Profile for macOS -->
+    <profile>
+      <id>macos</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>jpackage-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>package-macos</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jpackage</goal>
+                </goals>
+                <configuration>
+                  <input>${project.build.directory}</input>
+                  <mainJar>${project.build.finalName}.jar</mainJar>
+                  <icon>${project.basedir}/src/main/resources/icons/k5njournal.icns</icon>
+                  <appVersion>${project.version}</appVersion>
+                  <name>${project.artifactId}</name>
+                  <vendor>k5n.us</vendor>
+                  <targetPlatform>mac</targetPlatform>
+                  <destination>${project.basedir}/target/installer</destination>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profile for Windows -->
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>jpackage-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>package-windows</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jpackage</goal>
+                </goals>
+                <configuration>
+                  <input>${project.build.directory}</input>
+                  <mainJar>${project.build.finalName}.jar</mainJar>
+                  <icon>${project.basedir}/src/main/resources/icons/k5njournal.ico</icon>
+                  <appVersion>${project.version}</appVersion>
+                  <name>${project.artifactId}</name>
+                  <vendor>k5n.us</vendor>
+                  <targetPlatform>win</targetPlatform>
+                  <destination>${project.basedir}/target/installer</destination>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Profile for Linux -->
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <name>Linux</name>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>jpackage-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>package-linux</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jpackage</goal>
+                </goals>
+                <configuration>
+                  <input>${project.build.directory}</input>
+                  <mainJar>${project.build.finalName}.jar</mainJar>
+                  <icon>${project.basedir}/src/main/resources/icons/k5njournal.png</icon>
+                  <appVersion>${project.version}</appVersion>
+                  <name>${project.artifactId}</name>
+                  <vendor>k5n.us</vendor>
+                  <targetPlatform>linux</targetPlatform>
+                  <destination>${project.basedir}/target/installer</destination>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
