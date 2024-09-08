@@ -20,14 +20,21 @@
 package us.k5n.journal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseAdapter;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -35,19 +42,35 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.text.BadLocationException;
+
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.AmericanEnglish;
+import org.languagetool.rules.RuleMatch;
 
 import us.k5n.ical.Attachment;
 import us.k5n.ical.Categories;
 import us.k5n.ical.Date;
 import us.k5n.ical.Description;
 import us.k5n.ical.Journal;
+import us.k5n.ical.ParseException;
 import us.k5n.ical.Sequence;
 import us.k5n.ical.Summary;
+import us.k5n.ical.Uid;
 
 /**
  * Create a Journal entry edit window.
@@ -68,12 +91,20 @@ public class EditWindow extends JDialog implements ComponentListener {
 	JTextArea description;
 	AppPreferences prefs;
 	static ImageIcon saveIcon, cancelIcon;
+	private JLanguageTool langTool;
+	private Map<Integer, List<String>> spellingSuggestions = new HashMap<>();
+	private Map<Integer, RuleMatch> highlightMap = new HashMap<>();
+	private Timer spellCheckTimer; // Timer for periodic spell checking
+	private boolean textChanged = false; // Flag to track if text has changed
+	RuleMatch currentMatch;
 
 	public EditWindow(JFrame parent, Repository repo, Journal journal) {
 		super(parent);
 		prefs = AppPreferences.getInstance();
 		super.setSize(prefs.getEditWindowWidth(), prefs.getEditWindowHeight());
 		super.setLocation(prefs.getEditWindowX(), prefs.getEditWindowY());
+		// Create LanguageTool instance for US English
+		langTool = new JLanguageTool(new AmericanEnglish());
 		// TODO: don't make this modal once we add code to check
 		// things like deleting this entry in the main window, etc.
 		// super.setModal ( true );
@@ -82,6 +113,17 @@ public class EditWindow extends JDialog implements ComponentListener {
 		this.parent = parent;
 		this.repo = repo;
 		this.journal = journal;
+
+		spellCheckTimer = new Timer(5000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (textChanged) {
+					checkSpelling();
+					textChanged = false;
+				}
+			}
+		});
+		spellCheckTimer.start();
 
 		if (this.journal == null) {
 			this.journal = new Journal("", "", Date.getCurrentDateTime("DTSTART"));
@@ -100,12 +142,20 @@ public class EditWindow extends JDialog implements ComponentListener {
 			this.journal.setDescription(new Description());
 		if (this.journal.getCategories() == null)
 			this.journal.setCategories(new Categories());
+		if (this.journal.getUid() == null) {
+			try {
+				journal.setUid(new Uid(UIDGenerator.generateVJournalUID()));
+			} catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+		}
 
 		if (getAttachments() != null)
 			this.attachments = getAttachments();
 
 		createWindow();
 		setVisible(true);
+		checkSpelling();
 		this.addComponentListener(this);
 	}
 
@@ -118,6 +168,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout());
+
 		JButton saveButton = new JButton("Save");
 		if (saveIcon == null) {
 			URL imageURL = this.getClass().getClassLoader().getResource(
@@ -259,6 +310,47 @@ public class EditWindow extends JDialog implements ComponentListener {
 		JPanel descrPanel = new JPanel();
 		descrPanel.setLayout(new BorderLayout());
 		description = new JTextArea();
+		// Add a DocumentListener to track text changes
+		description.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				textChanged = true;
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				textChanged = true;
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				textChanged = true;
+			}
+		});
+		description.addMouseMotionListener(new MouseInputAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int pos = description.viewToModel2D(e.getPoint());
+				if (isPositionInHighlight(pos)) {
+					String tooltipText = getTooltipTextForPosition(pos);
+					description.setToolTipText(tooltipText); // Set the tooltip with suggestions
+				} else {
+					description.setToolTipText(null); // No tooltip if not hovering over a highlight
+				}
+			}
+		});
+		description.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)
+						|| (SwingUtilities.isLeftMouseButton(e) && e.isControlDown())) {
+					int pos = description.viewToModel2D(e.getPoint());
+					if (isPositionInHighlight(pos)) {
+						showPopupMenu(e, pos); // Show popup menu with suggestions
+					}
+				}
+			}
+		});
 		description.setLineWrap(true);
 		description.setWrapStyleWord(true);
 		if (journal != null && journal.getDescription() != null)
@@ -266,9 +358,117 @@ public class EditWindow extends JDialog implements ComponentListener {
 		description.setCaretPosition(0);
 		JScrollPane scrollPane = new JScrollPane(description);
 		descrPanel.add(scrollPane, BorderLayout.CENTER);
+		description.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO: implement
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+		});
+		// Caret listener to track cursor position
+		description.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				int caretPosition = e.getDot();
+				if (isPositionInHighlight(caretPosition)) {
+					showSuggestionsForPosition(caretPosition);
+				}
+			}
+		});
+
 		allButButtons.add(descrPanel, BorderLayout.CENTER);
 
 		getContentPane().add(allButButtons, BorderLayout.CENTER);
+	}
+
+	private String getTooltipTextForPosition(int position) {
+		if (currentMatch != null) {
+			StringBuilder tooltip = new StringBuilder();
+			// Add the message for the rule (usually a description of the issue)
+			tooltip.append(currentMatch.getMessage());
+			// If there are suggested replacements, append them to the tooltip
+			List<String> suggestions = currentMatch.getSuggestedReplacements();
+			if (!suggestions.isEmpty()) {
+				tooltip.append(" Suggestions: ");
+				tooltip.append(String.join(", ", suggestions));
+			}
+			return tooltip.toString();
+		}
+		return null;
+	}
+
+	private boolean isPositionInHighlight(int position) {
+		// Iterate through the highlight map to see if the position falls within any
+		// highlight range
+		for (Map.Entry<Integer, RuleMatch> entry : highlightMap.entrySet()) {
+			int startPos = entry.getKey();
+			RuleMatch match = entry.getValue();
+			int endPos = match.getToPos();
+
+			if (position >= startPos && position <= endPos) {
+				currentMatch = match; // Store the current match for suggestions
+				//System.out.println("Position " + position + " is in highlight.");
+				//System.out.println("Current match: " + currentMatch);
+				return true;
+			}
+		}
+		//System.out.println("Position " + position + " is not in highlight.");
+		return false;
+	}
+
+	private void showSuggestionsForPosition(int position) {
+		if (currentMatch != null) {
+			List<String> suggestions = currentMatch.getSuggestedReplacements();
+			if (!suggestions.isEmpty()) {
+				// Show suggestions as tooltips or handle them as needed
+				description.setToolTipText(String.join(", ", suggestions));
+			}
+		}
+	}
+
+	private void showPopupMenu(MouseEvent e, int position) {
+		if (currentMatch != null) {
+			List<String> suggestions = currentMatch.getSuggestedReplacements();
+			if (!suggestions.isEmpty()) {
+				JPopupMenu popupMenu = new JPopupMenu();
+				for (String suggestion : suggestions) {
+					JMenuItem menuItem = new JMenuItem(suggestion);
+					menuItem.addActionListener(event -> replaceText(position, suggestion)); // Replace text on click
+					popupMenu.add(menuItem);
+				}
+				popupMenu.show(description, e.getX(), e.getY()); // Show the popup menu at the mouse click position
+			}
+		}
+	}
+
+	private void replaceText(int position, String replacement) {
+		try {
+			// Replace the misspelled word with the selected suggestion
+			int startPos = currentMatch.getFromPos();
+			int endPos = currentMatch.getToPos();
+			description.getDocument().remove(startPos, endPos - startPos);
+			description.getDocument().insertString(startPos, replacement, null);
+			// Clear the highlight after replacement
+			description.getHighlighter().removeAllHighlights();
+			checkSpelling(); // Re-check spelling after the replacement
+		} catch (BadLocationException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	String getAttachmentsLabel(List<Attachment> list) {
@@ -312,6 +512,28 @@ public class EditWindow extends JDialog implements ComponentListener {
 		}
 	}
 
+	private void checkSpelling() {
+		try {
+			String text = description.getText();
+			description.getHighlighter().removeAllHighlights();
+			highlightMap.clear();
+			// Perform spelling check
+			List<RuleMatch> matches = langTool.check(text);
+			// Highlight the detected mistakes
+			for (RuleMatch match : matches) {
+				int startPos = match.getFromPos();
+				int endPos = match.getToPos();
+				// Highlight the misspelled word in pink
+				description.getHighlighter().addHighlight(startPos, endPos,
+					new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.PINK));
+				// Store the RuleMatch for future reference (tooltip, replacement suggestions)
+				highlightMap.put(startPos, match);
+			}
+		} catch (IOException | javax.swing.text.BadLocationException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	void close() {
 		// TODO: check for unsaved changes
 		this.dispose();
@@ -341,5 +563,4 @@ public class EditWindow extends JDialog implements ComponentListener {
 		prefs.setEditWindowX(this.getX());
 		prefs.setEditWindowY(this.getY());
 	}
-
 }

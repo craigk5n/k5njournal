@@ -1,9 +1,11 @@
 k5nJournal ChangeLog
 
-Version 0.3.3 (02 Sep 2024)
+Version 0.3.3 (06 Sep 2024)
 - Update to use javacaltools 1.0.2
 - Switched build from ant to maven
 - Replaced all uses of Vector with List
+- Added FlatLightLaf for a more modern UI appearance
+- Added spell checking for US English with suggestions (right mouse click)
 
 Version 0.3.2 (10 Apr 2011)
 - Improved search for icons on startup.  (Helpful for running

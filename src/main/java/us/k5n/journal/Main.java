@@ -75,6 +75,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import us.k5n.ical.Categories;
 import us.k5n.ical.Constants;
 import us.k5n.ical.Description;
@@ -855,13 +857,9 @@ public class Main extends JFrame implements Constants, ComponentListener,
 	 */
 	public static void setWindowsLAF() {
 		try {
-			if (System.getProperty("os.name").toLowerCase().contains("win")) {
-				UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-			} else {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
+			UIManager.setLookAndFeel(new FlatLightLaf());
 		} catch (Exception e) {
-			System.out.println("Unable to load Windows UI: " + e.toString());
+			System.out.println("Unable to load FlatLightLaf: " + e.toString());
 		}
 	}
 
@@ -979,13 +977,13 @@ public class Main extends JFrame implements Constants, ComponentListener,
 				// System.out.println ( "new password: " + p1 );
 			}
 		}
-
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		FlatLightLaf.setup();
 		new Main();
 	}
 
