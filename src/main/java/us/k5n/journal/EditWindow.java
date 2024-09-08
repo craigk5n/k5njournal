@@ -43,6 +43,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -89,15 +90,26 @@ public class EditWindow extends JDialog implements ComponentListener {
 	List<Attachment> attachments;
 	JLabel startDate;
 	JTextArea description;
+	private String originalDescriptionText;
 	AppPreferences prefs;
 	static ImageIcon saveIcon, cancelIcon;
 	private JLanguageTool langTool;
-	private Map<Integer, List<String>> spellingSuggestions = new HashMap<>();
 	private Map<Integer, RuleMatch> highlightMap = new HashMap<>();
 	private Timer spellCheckTimer; // Timer for periodic spell checking
 	private boolean textChanged = false; // Flag to track if text has changed
 	RuleMatch currentMatch;
+	private int lastEditStartPos = -1; // Start position of the last edit
+	private int lastEditEndPos = -1; // End position of the last edit
+	private long lastEditTime = -1; // Timestamp of the last edit
+	private Timer editTimer; // Timer to track 5 seconds since last edit
 
+	/**
+	 * Constructs an EditWindow dialog for editing a Journal entry.
+	 *
+	 * @param parent  the parent JFrame for this dialog
+	 * @param repo    the Repository instance
+	 * @param journal the Journal instance to edit, or null to create a new one
+	 */
 	public EditWindow(JFrame parent, Repository repo, Journal journal) {
 		super(parent);
 		prefs = AppPreferences.getInstance();
@@ -114,7 +126,9 @@ public class EditWindow extends JDialog implements ComponentListener {
 		this.repo = repo;
 		this.journal = journal;
 
-		spellCheckTimer = new Timer(5000, new ActionListener() {
+		// Check the spelling every 2 seconds. Any more than that can make the UI
+		// feel a bit sluggish.
+		spellCheckTimer = new Timer(2000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (textChanged) {
@@ -124,6 +138,18 @@ public class EditWindow extends JDialog implements ComponentListener {
 			}
 		});
 		spellCheckTimer.start();
+
+		editTimer = new Timer(5000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Reset the last edit positions after 5 seconds of inactivity
+				lastEditStartPos = -1;
+				lastEditEndPos = -1;
+				lastEditTime = -1;
+			}
+		});
+		editTimer.setRepeats(false); // We only want it to trigger once per period of inactivity
+		editTimer.start();
 
 		if (this.journal == null) {
 			this.journal = new Journal("", "", Date.getCurrentDateTime("DTSTART"));
@@ -152,6 +178,7 @@ public class EditWindow extends JDialog implements ComponentListener {
 
 		if (getAttachments() != null)
 			this.attachments = getAttachments();
+		originalDescriptionText = this.journal.getDescription() != null ? this.journal.getDescription().getValue() : "";
 
 		createWindow();
 		setVisible(true);
@@ -314,17 +341,27 @@ public class EditWindow extends JDialog implements ComponentListener {
 		description.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+				updateLastEditPosition(e);
 				textChanged = true;
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
+				updateLastEditPosition(e);
 				textChanged = true;
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				textChanged = true;
+			}
+
+			private void updateLastEditPosition(DocumentEvent e) {
+				// Store the positions of the edit for later reference
+				lastEditStartPos = e.getOffset();
+				lastEditEndPos = e.getOffset() + e.getLength();
+				lastEditTime = System.currentTimeMillis(); // Store the current timestamp of the edit
+				editTimer.restart(); // Reset the 5-second timer for this edit
 			}
 		});
 		description.addMouseMotionListener(new MouseInputAdapter() {
@@ -390,6 +427,18 @@ public class EditWindow extends JDialog implements ComponentListener {
 				}
 			}
 		});
+		description.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				int caretPosition = e.getDot();
+				if (caretPosition < lastEditStartPos || caretPosition > lastEditEndPos) {
+					// If the caret has moved outside of the edited word, reset the last edit
+					// tracking
+					lastEditStartPos = -1;
+					lastEditEndPos = -1;
+				}
+			}
+		});
 
 		allButButtons.add(descrPanel, BorderLayout.CENTER);
 
@@ -422,12 +471,12 @@ public class EditWindow extends JDialog implements ComponentListener {
 
 			if (position >= startPos && position <= endPos) {
 				currentMatch = match; // Store the current match for suggestions
-				//System.out.println("Position " + position + " is in highlight.");
-				//System.out.println("Current match: " + currentMatch);
+				// System.out.println("Position " + position + " is in highlight.");
+				// System.out.println("Current match: " + currentMatch);
 				return true;
 			}
 		}
-		//System.out.println("Position " + position + " is not in highlight.");
+		// System.out.println("Position " + position + " is not in highlight.");
 		return false;
 	}
 
@@ -517,15 +566,24 @@ public class EditWindow extends JDialog implements ComponentListener {
 			String text = description.getText();
 			description.getHighlighter().removeAllHighlights();
 			highlightMap.clear();
-			// Perform spelling check
 			List<RuleMatch> matches = langTool.check(text);
-			// Highlight the detected mistakes
 			for (RuleMatch match : matches) {
 				int startPos = match.getFromPos();
 				int endPos = match.getToPos();
+
+				// Skip this word if it overlaps with the last edit position and the edit was
+				// within 1 second
+				if ((startPos >= lastEditStartPos && startPos <= lastEditEndPos) ||
+						(endPos >= lastEditStartPos && endPos <= lastEditEndPos)) {
+					// Only skip if the last edit was less than 5 seconds ago
+					if (System.currentTimeMillis() - lastEditTime < 5000) {
+						continue;
+					}
+				}
+
 				// Highlight the misspelled word in pink
 				description.getHighlighter().addHighlight(startPos, endPos,
-					new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.PINK));
+						new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.PINK));
 				// Store the RuleMatch for future reference (tooltip, replacement suggestions)
 				highlightMap.put(startPos, match);
 			}
@@ -535,8 +593,26 @@ public class EditWindow extends JDialog implements ComponentListener {
 	}
 
 	void close() {
-		// TODO: check for unsaved changes
-		this.dispose();
+		String currentDescriptionText = description.getText().trim();
+		boolean hasUnsavedChanges = !currentDescriptionText.equals(originalDescriptionText);
+		if (hasUnsavedChanges) {
+			int option = JOptionPane.showConfirmDialog(
+					this,
+					"There are unsaved changes. Do you want to save before closing?",
+					"Unsaved Changes",
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+
+			if (option == JOptionPane.YES_OPTION) {
+				save();
+			} else if (option == JOptionPane.NO_OPTION) {
+				dispose();
+			} else if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+				return;
+			}
+		} else {
+			dispose();
+		}
 	}
 
 	public void componentHidden(ComponentEvent ce) {

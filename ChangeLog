@@ -6,6 +6,7 @@ Version 0.3.3 (06 Sep 2024)
 - Replaced all uses of Vector with List
 - Added FlatLightLaf for a more modern UI appearance
 - Added spell checking for US English with suggestions (right mouse click)
+- Ask the user to confirm before closing the edit window with unsaved changes
 
 Version 0.3.2 (10 Apr 2011)
 - Improved search for icons on startup.  (Helpful for running
